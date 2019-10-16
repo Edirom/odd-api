@@ -1,39 +1,15 @@
-# module2
-This is a starting point for building (prototype) tools based on **eXist-db**, 
-**NodeJS**, and **Gulp**. It compiles Ecmascript2015 (ES6) to regular Javascript, 
-translates SASS to css, and works well with Docker. However, this is just a 
-start for a development workflow, and may need to be adjusted for specific
-use cases. 
+# ODD API
 
-#Requirements
-* NodeJS (I'm using v6.11.3 right now)
-* eXist-db (I'm using v3.4.1 right now)
+This is a small web application that provides information about an ODD (either TEI or MEI). At this point, it supports MEI 4.0.1 only. 
 
-#Installation
-* fork or download from Git
-* run ```npm install```
-* copy *existConfig.tmpl.json* to *existConfig.json*
-* adjust your configuration in that file. No worries, it will be ignored by Git.
-* adjust *package.json*. All information for building the eXist app will be derived from there
+The API offers the following endpoints: 
 
-#Gulp Tasks
-* **watch** This task watches for changes to the source directories and uploads changes to a local eXist-db
-* **dist** This task creates a xar package of the current state.
-* **bump-patch** This task bumps the version number at patch level (according to semver)
-* **bump-minor** This task bumps the version number at minor level (according to semver)
-* **bump-major** This task bumps the version number at major level (according to semver)
+*http://sample.net*/odd-api/mei/4.0.1/modules.json
 
-Other tasks (called by the above tasks)
-* **load-assets** loads assets like Verovio from node_modules and puts them in the right places 
-* **html** loads HTML files. no templating mechanism included
-* **css** compiles SASS to minified css
-* **js** compiles ES6 to minified / uglified JS
-* **xql** copies xql and xqm files into the right folders
-* **xslt** copies xslt into the right folder
-* **data** copies data into the right folder
-* **xar-structure** builds the basic structure for the eXist-app
-* **del** empties the /build and /dist folders
-* **deploy** uploads the app to a local eXist database 
+*http://sample.net*/odd-api/mei/4.0.1/MEI.cmn/elements.json
 
-#Todos
-* **lint** There is a gulp lint task, but it currently fails to autofix things. 
+*http://sample.net*/odd-api/mei/4.0.1/MEI.cmn/attCLasses.json
+
+*http://sample.net*/odd-api/mei/4.0.1/bracketSpan/atts.json
+ 
+It will return JSON with the corresponding information. The two folders (*mei* and *4.0.1*) reflect folders inside the */data* folder of the app. If you want to support additional, ODD-based formats, just put them in the appropriate folders and the app will pick them up.
