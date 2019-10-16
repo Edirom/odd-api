@@ -6,11 +6,11 @@
 FROM openjdk:8-jdk as builder
 LABEL maintainer="Johannes Kepper"
 
-ENV ODD-API_BUILD_HOME="/opt/odd-api-build"
+ENV ODDAPI_BUILD_HOME="/opt/oddapi-build"
 
 ADD https://deb.nodesource.com/setup_8.x /tmp/nodejs_setup 
 
-WORKDIR ${ODD-API_BUILD_HOME}
+WORKDIR ${ODDAPI_BUILD_HOME}
 
 RUN apt-get update \
     && apt-get install -y --force-yes git \
@@ -24,7 +24,7 @@ COPY . .
 
 RUN addgroup oddapibuilder \
     && adduser oddapibuilder --ingroup oddapibuilder --disabled-password --system \
-    && chown -R oddapibuilder:oddapibuilder ${ODD-API_BUILD_HOME}
+    && chown -R oddapibuilder:oddapibuilder ${ODDAPI_BUILD_HOME}
 
 USER oddapibuilder:oddapibuilder
 
@@ -49,4 +49,4 @@ ENV EXIST_DEFAULT_APP_PATH="xmldb:exist:///db/apps/odd-api"
 
 # simply copy our SMuFL-browser xar package
 # to the eXist-db autodeploy folder
-COPY --from=builder /opt/odd-api-build/dist/*.xar ${EXIST_HOME}/autodeploy/
+COPY --from=builder /opt/oddapi-build/dist/*.xar ${EXIST_HOME}/autodeploy/
