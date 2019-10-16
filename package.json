@@ -1,0 +1,31 @@
+{
+  "name": "odd-api",
+  "version": "0.4.1",
+  "description": "This is a small exist-db app which makes the ODD structures of an MEI or TEI document available through a REST api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "TEI",
+    "MEI",
+    "ODD"
+  ],
+  "author": "Johannes Kepper",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "dateformat": "^3.0.3",
+    "del": "^5.1.0",
+    "fs": "0.0.1-security",
+    "git-rev-sync": "^1.12.0",
+    "gulp": "^4.0.2",
+    "gulp-cli": "^2.2.0",
+    "gulp-exist": "^3.0.0",
+    "gulp-newer": "^1.4.0",
+    "gulp-replace": "^1.0.0",
+    "gulp-zip": "^5.0.1",
+    "run-sequence": "^2.2.1",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
+  }
+}
