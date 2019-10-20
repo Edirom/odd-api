@@ -46,12 +46,14 @@ declare function local:getClasses($parent as node(),$odd.source as node()) as xs
         
     let $type := substring-before(local-name($parent),'Spec')
     let $ident := $parent/@ident
+    let $module := $parent/@module
     let $desc := normalize-space(string-join($parent/tei:desc//text(),' '))
     
     return 
         '{' ||
             '"name":"' || $ident || '",' ||
             '"desc":"' || $desc || '",' ||
+            '"module":"' || $module || '",' ||
             '"atts":' || $directAtts || ',' ||
             '"classes":[' || string-join($memberClasses,',') || ']' ||
         '}'
