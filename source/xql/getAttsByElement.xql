@@ -27,8 +27,8 @@ declare function local:getIdentAndDesc($obj as node()) as map(*) {
         }
 };
 
-declare function local:getDirectAtts($parent as node()) as map(*)* {
-    $parent//tei:attDef ! local:getIdentAndDesc(.)
+declare function local:getDirectAtts($parent as node()) as array(*) {
+    array { $parent//tei:attDef ! local:getIdentAndDesc(.) }
 };
 
 declare function local:getClasses($parent as node(),$odd.source as node()) as map(*) {
@@ -51,7 +51,7 @@ declare function local:getClasses($parent as node(),$odd.source as node()) as ma
             'desc': $desc,
             'module': $module,
             'atts': $directAtts,
-            'classes': $memberClasses
+            'classes': array { $memberClasses }
         }
 };
 

@@ -34,4 +34,4 @@ let $attClasses :=
         }
 
 return 
-    $attClasses
+    array { $attClasses }

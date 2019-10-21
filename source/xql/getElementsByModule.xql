@@ -34,6 +34,7 @@ let $elements :=
         }
     
     
-return 
-    $elements
+
+return
+    array { $elements }
 
