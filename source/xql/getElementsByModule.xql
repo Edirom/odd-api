@@ -1,4 +1,4 @@
-xquery version "3.0";
+xquery version "3.1";
 
 (:
     getElementsByModule.xql
@@ -12,7 +12,7 @@ declare namespace util="http://exist-db.org/xquery/util";
 declare namespace transform="http://exist-db.org/xquery/transform";
 declare namespace response="http://exist-db.org/xquery/response"; 
 
-declare option exist:serialize "method=xml media-type=text/javascript omit-xml-declaration=yes indent=yes";
+declare option exist:serialize "method=json media-type=application/json";
 
 let $header-addition := response:set-header("Access-Control-Allow-Origin","*")
 
@@ -29,16 +29,16 @@ let $odd.source := collection($path)//tei:TEI
 
 let $elements := 
     for $elem in $odd.source//tei:elementSpec[@module = ($module,$module.replaced)]
-    let $ident := $elem/@ident
+    let $ident := $elem/data(@ident)
     let $desc := replace(normalize-space(string-join($elem/tei:desc//text(),' ')),'"','&apos;')
     return 
-        '{' ||
-        '"name":"' || $ident || '",' ||
-        '"desc":"' || $desc || '"' ||
-        '}'
+        map {
+            'name': $ident,
+            'desc': $desc
+        }
     
     
 return 
-    '[' || string-join($elements,',') || ']'
+    [$elements]
 
 

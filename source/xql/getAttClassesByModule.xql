@@ -1,4 +1,4 @@
-xquery version "3.0";
+xquery version "3.1";
 
 (:
     getAttClassesByModule.xql
@@ -12,7 +12,7 @@ declare namespace util="http://exist-db.org/xquery/util";
 declare namespace transform="http://exist-db.org/xquery/transform";
 declare namespace response="http://exist-db.org/xquery/response"; 
 
-declare option exist:serialize "method=xml media-type=text/javascript omit-xml-declaration=yes indent=yes";
+declare option exist:serialize "method=json media-type=application/json";
 
 let $header-addition := response:set-header("Access-Control-Allow-Origin","*")
 
@@ -28,17 +28,14 @@ let $path := $data.basePath || '/' || $format || '/' || $version
 let $odd.source := collection($path)//tei:TEI
 
 let $attClasses := 
-    for $attClass in $odd.source//tei:classSpec[@module = ($module,$module.replaced) and @type = 'atts']
-    let $ident := $attClass/@ident
+    for $attClass in $odd.source//tei:classSpec[@module = ($module,$module.replaced)][@type = 'atts']
+    let $ident := $attClass/data(@ident)
     let $desc := replace(normalize-space(string-join($attClass/tei:desc//text(),' ')),'"','&apos;')
     return 
-        '{' ||
-        '"name":"' || $ident || '",' ||
-        '"desc":"' || $desc || '"' ||
-        '}'
-    
-    
+        map {
+            'name': $ident,
+            'desc': $desc
+        }
+
 return 
-    '[' || string-join($attClasses,',') || ']'
-
-
+    [$attClasses]
