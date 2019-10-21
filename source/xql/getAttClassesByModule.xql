@@ -28,7 +28,7 @@ let $odd.source := config:odd-source()
 let $attClasses := 
     for $attClass in $odd.source//tei:classSpec[@module = ($module,$module.replaced)][@type = 'atts']
     let $ident := $attClass/data(@ident)
-    let $desc := replace(normalize-space(string-join($attClass/tei:desc//text(),' ')),'"','&apos;')
+    let $desc := $attClass/tei:desc => normalize-space()
     return 
         map {
             'name': $ident,

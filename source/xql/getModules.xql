@@ -24,7 +24,7 @@ let $odd.source := config:odd-source()
 let $modules := 
     for $module in $odd.source//tei:moduleSpec
     let $ident := $module/data(@ident)
-    let $desc := replace(normalize-space(string-join($module/tei:desc//text(),' ')),'"','&apos;')
+    let $desc := $module/tei:desc => normalize-space()
     let $elementCount := count($odd.source//tei:elementSpec[@module = $ident])
     let $attClassCount := count($odd.source//tei:classSpec[@type = 'atts'][@module = $ident])
     return

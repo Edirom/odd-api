@@ -28,7 +28,7 @@ let $odd.source := config:odd-source()
 let $elements := 
     for $elem in $odd.source//tei:elementSpec[@module = ($module,$module.replaced)]
     let $ident := $elem/data(@ident)
-    let $desc := replace(normalize-space(string-join($elem/tei:desc//text(),' ')),'"','&apos;')
+    let $desc := $elem/tei:desc => normalize-space()
     return 
         map {
             'name': $ident,

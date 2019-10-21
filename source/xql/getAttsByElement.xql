@@ -19,7 +19,7 @@ declare option exist:serialize "method=json media-type=application/json";
 
 declare function local:getIdentAndDesc($obj as node()) as map(*) {
     let $ident := $obj/data(@ident)
-    let $desc := replace(normalize-space(string-join($obj/tei:desc//text(),' ')),'"','&apos;')
+    let $desc := $obj/tei:desc => normalize-space()
     return 
         map {
             'name': $ident,
@@ -43,7 +43,7 @@ declare function local:getClasses($parent as node(),$odd.source as node()) as ma
     let $type := substring-before(local-name($parent),'Spec')
     let $ident := $parent/data(@ident)
     let $module := $parent/data(@module)
-    let $desc := replace(normalize-space(string-join($parent/tei:desc//text(),' ')),'"','&apos;')
+    let $desc := $parent/tei:desc => normalize-space()
     
     return
         map {
