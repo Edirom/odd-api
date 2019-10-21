@@ -26,7 +26,7 @@ let $odd.source := config:odd-source()
 let $attClasses := 
     for $attClass in $odd.source//tei:classSpec[@module = ($module,$module.replaced)][@type = 'atts']
     let $ident := $attClass/data(@ident)
-    let $desc := $attClass/tei:desc => normalize-space()
+    let $desc := ($attClass/tei:desc[@xml:lang = config:docLang()], $attClass/tei:desc)[1] => normalize-space()
     return 
         map {
             'name': $ident,

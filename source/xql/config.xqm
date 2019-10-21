@@ -41,3 +41,14 @@ declare function config:odd-source() as element(tei:TEI) {
     return
         collection(string-join(($config:data-root, $format, $version), '/'))//tei:TEI
 };
+
+(:~
+ :  The requested "documentation language" (per URL parameter). 
+ :  It specifies which language to use when 
+ :  creating documentation if the description for an element, attribute, class 
+ :  or macro is available in more than one language.
+ :  See https://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-schemaSpec.html
+ :)
+declare function config:docLang() as xs:string {
+    request:get-parameter('docLang','')
+};
