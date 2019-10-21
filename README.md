@@ -8,7 +8,7 @@ The API offers the following endpoints:
 
 *http://sample.net*/odd-api/mei/4.0.1/MEI.cmn/elements.json
 
-*http://sample.net*/odd-api/mei/4.0.1/MEI.cmn/attCLasses.json
+*http://sample.net*/odd-api/mei/4.0.1/MEI.cmn/attClasses.json
 
 *http://sample.net*/odd-api/mei/4.0.1/bracketSpan/atts.json
  
