@@ -7,6 +7,8 @@ xquery version "3.1";
     $param: 
 :)
 
+import module namespace config="http://odd-api.edirom.de/xql/config" at "config.xqm";
+
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace request="http://exist-db.org/xquery/request";
 declare namespace util="http://exist-db.org/xquery/util";
@@ -17,14 +19,7 @@ declare option exist:serialize "method=json media-type=application/json";
 
 let $header-addition := response:set-header("Access-Control-Allow-Origin","*")
 
-let $data.basePath := '/db/apps/odd-api/data'
-
-let $format := request:get-parameter('format','')
-let $version := request:get-parameter('version','')
-
-let $path := $data.basePath || '/' || $format || '/' || $version
-
-let $odd.source := collection($path)//tei:TEI
+let $odd.source := config:odd-source()
 
 let $modules := 
     for $module in $odd.source//tei:moduleSpec

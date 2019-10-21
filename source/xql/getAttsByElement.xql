@@ -6,6 +6,8 @@ xquery version "3.1";
     This xQuery loads all attributes available on a given element
 :)
 
+import module namespace config="http://odd-api.edirom.de/xql/config" at "config.xqm";
+
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace request="http://exist-db.org/xquery/request";
 declare namespace util="http://exist-db.org/xquery/util";
@@ -55,15 +57,10 @@ declare function local:getClasses($parent as node(),$odd.source as node()) as ma
 
 let $header-addition := response:set-header("Access-Control-Allow-Origin","*")
 
-let $data.basePath := '/db/apps/odd-api/data'
-
-let $format := request:get-parameter('format','')
-let $version := request:get-parameter('version','')
 let $elem := request:get-parameter('element','')
 
-let $path := $data.basePath || '/' || $format || '/' || $version
 
-let $odd.source := collection($path)//tei:TEI
+let $odd.source := config:odd-source()
 let $element := $odd.source//tei:elementSpec[@ident = $elem]
 
 let $classes := local:getClasses($element,$odd.source)

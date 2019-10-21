@@ -6,6 +6,8 @@ xquery version "3.1";
     This xQuery loads all elements contained in a given module
 :)
 
+import module namespace config="http://odd-api.edirom.de/xql/config" at "config.xqm";
+
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace request="http://exist-db.org/xquery/request";
 declare namespace util="http://exist-db.org/xquery/util";
@@ -16,16 +18,12 @@ declare option exist:serialize "method=json media-type=application/json";
 
 let $header-addition := response:set-header("Access-Control-Allow-Origin","*")
 
-let $data.basePath := '/db/apps/odd-api/data'
-
-let $format := request:get-parameter('format','')
-let $version := request:get-parameter('version','')
 let $module := request:get-parameter('module','')
 let $module.replaced := replace($module,'_','.')
 
 let $path := $data.basePath || '/' || $format || '/' || $version
 
-let $odd.source := collection($path)//tei:TEI
+let $odd.source := config:odd-source()
 
 let $elements := 
     for $elem in $odd.source//tei:elementSpec[@module = ($module,$module.replaced)]
