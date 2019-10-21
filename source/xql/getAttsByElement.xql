@@ -13,7 +13,7 @@ declare namespace transform="http://exist-db.org/xquery/transform";
 declare namespace response="http://exist-db.org/xquery/response";
 declare namespace local="no:link";
 
-declare option exist:serialize "method=xml media-type=text/plain omit-xml-declaration=yes indent=yes";
+declare option exist:serialize "method=xml media-type=text/javascript omit-xml-declaration=yes indent=yes";
 
 declare function local:getIdentAndDesc($obj as node()) as xs:string {
     let $ident := $obj/@ident
@@ -47,7 +47,7 @@ declare function local:getClasses($parent as node(),$odd.source as node()) as xs
     let $type := substring-before(local-name($parent),'Spec')
     let $ident := $parent/@ident
     let $module := $parent/@module
-    let $desc := normalize-space(string-join($parent/tei:desc//text(),' '))
+    let $desc := replace(normalize-space(string-join($parent/tei:desc//text(),' ')),'"','&apos;')
     
     return 
         '{' ||

@@ -13,7 +13,7 @@ declare namespace util="http://exist-db.org/xquery/util";
 declare namespace transform="http://exist-db.org/xquery/transform";
 declare namespace response="http://exist-db.org/xquery/response"; 
 
-declare option exist:serialize "method=xml media-type=text/plain omit-xml-declaration=yes indent=yes";
+declare option exist:serialize "method=xml media-type=text/javascript omit-xml-declaration=yes indent=yes";
 
 let $header-addition := response:set-header("Access-Control-Allow-Origin","*")
 
@@ -29,11 +29,11 @@ let $odd.source := collection($path)//tei:TEI
 let $modules := 
     for $module in $odd.source//tei:moduleSpec
     let $ident := $module/@ident
-    let $desc := $module/tei:desc/text()
+    let $desc := replace(normalize-space(string-join($module/tei:desc//text(),' ')),'"','&apos;')
     let $elementCount := count($odd.source//tei:elementSpec[@module = $ident])
     let $attClassCount := count($odd.source//tei:classSpec[@type = 'atts' and @module = $ident])
     return '{' ||
-        '"name":"' || $ident || '",' ||
+        '"name":"' || $module/@ident || '",' ||
         '"desc":"' || $desc || '",' ||
         '"elementCount":"' || $elementCount || '",' ||
         '"attClassCount":"' || $attClassCount || '"' ||
