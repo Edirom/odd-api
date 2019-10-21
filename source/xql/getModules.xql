@@ -36,4 +36,4 @@ let $modules :=
         }
 
 return 
-    [$modules]
+    $modules

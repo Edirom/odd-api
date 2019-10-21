@@ -35,6 +35,5 @@ let $elements :=
     
     
 return 
-    [$elements]
-
+    $elements
 
