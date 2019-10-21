@@ -21,8 +21,6 @@ let $header-addition := response:set-header("Access-Control-Allow-Origin","*")
 let $module := request:get-parameter('module','')
 let $module.replaced := replace($module,'_','.')
 
-let $path := $data.basePath || '/' || $format || '/' || $version
-
 let $odd.source := config:odd-source()
 
 let $elements := 
