@@ -22,15 +22,12 @@ RUN npm install \
 #########################
 FROM stadlerpeter/existdb
 
-# add SMuFL-browser specific settings 
-# for a production ready environment with 
-# SMuFL-browser as the root app.
 # For more details about the options see  
 # https://github.com/peterstadler/existdb-docker
 ENV EXIST_ENV="production"
 ENV EXIST_CONTEXT_PATH="/"
 ENV EXIST_DEFAULT_APP_PATH="xmldb:exist:///db/apps/odd-api"
 
-# simply copy our SMuFL-browser xar package
+# simply copy our xar package
 # to the eXist-db autodeploy folder
 COPY --from=builder /opt/oddapi-build/dist/*.xar ${EXIST_HOME}/autodeploy/
