@@ -3,30 +3,14 @@
 # 1. set up the build environment and build the expath-package
 # 2. run the eXist-db
 #########################
-FROM openjdk:8-jdk as builder
+FROM node:13 as builder
 LABEL maintainer="Johannes Kepper"
 
 ENV ODDAPI_BUILD_HOME="/opt/oddapi-build"
 
-ADD https://deb.nodesource.com/setup_8.x /tmp/nodejs_setup 
-
 WORKDIR ${ODDAPI_BUILD_HOME}
 
-RUN apt-get update \
-    && apt-get install -y --force-yes git \
-    # installing nodejs
-    && chmod 755 /tmp/nodejs_setup; sync \
-    && /tmp/nodejs_setup \
-    && apt-get install -y nodejs \
-    && ln -s /usr/bin/nodejs /usr/local/bin/node
-
 COPY . .
-
-RUN addgroup oddapibuilder \
-    && adduser oddapibuilder --ingroup oddapibuilder --disabled-password --system \
-    && chown -R oddapibuilder:oddapibuilder ${ODDAPI_BUILD_HOME}
-
-USER oddapibuilder:oddapibuilder
 
 RUN npm install \
     && cp existConfig.tmpl.json existConfig.json \
