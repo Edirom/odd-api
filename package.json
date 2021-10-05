@@ -20,7 +20,7 @@
     "git-rev-sync": "^1.12.0",
     "gulp": "^4.0.2",
     "gulp-cli": "^2.3.0",
-    "gulp-exist": "^3.0.0",
+    "@existdb/gulp-exist": "^4.0.0",
     "gulp-newer": "^1.4.0",
     "gulp-replace": "^1.1.3",
     "gulp-zip": "^5.1.0",

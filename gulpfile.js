@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var zip = require('gulp-zip');
 var replace = require('gulp-replace');
 var newer = require('gulp-newer');
-var exist = require('gulp-exist');
+var exist = require('@existdb/gulp-exist');
 var dateformat = require('dateformat');
 var fs = require('fs');
 
