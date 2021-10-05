@@ -1,7 +1,7 @@
 # ODD API
 
 [![Docker Cloud Automated build](https://img.shields.io/docker/cloud/automated/edirom/odd-api)](https://hub.docker.com/r/edirom/odd-api/)
-[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/edirom/odd-api.svg)](https://hub.docker.com/r/edirom/odd-api/)
+[![Docker](https://github.com/Edirom/odd-api/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/Edirom/odd-api/actions/workflows/docker-publish.yml)
 
 This is a small web application that provides information about an ODD (either TEI or MEI). At this point, it supports MEI 4.0.1 and TEI 4.0.0. 
 
