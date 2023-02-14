@@ -7,7 +7,7 @@ declare variable $exist:prefix external;
 declare variable $exist:root external;
 
 (: get all available modules :)
-if(matches($exist:path,'/[a-z]+/[\da-zA-Z-_\.]+/modules.json$')) then (
+if(matches($exist:path,'/[a-z]+/[\da-zA-Z\-_\.]+/modules.json$')) then (
     
     response:set-header("Access-Control-Allow-Origin", "*"),
     
@@ -19,7 +19,7 @@ if(matches($exist:path,'/[a-z]+/[\da-zA-Z-_\.]+/modules.json$')) then (
     </dispatch>
 
 (: gets the elements of a given module :)
-) else if(matches($exist:path,'/[a-z]+/[\da-zA-Z-_\.]+/[\da-zA-Z-_\.]+/elements.json$')) then (
+) else if(matches($exist:path,'/[a-z]+/[\da-zA-Z\-_\.]+/[\da-zA-Z\-_\.]+/elements.json$')) then (
     
     response:set-header("Access-Control-Allow-Origin", "*"),
     
@@ -32,7 +32,7 @@ if(matches($exist:path,'/[a-z]+/[\da-zA-Z-_\.]+/modules.json$')) then (
     </dispatch>
     
 (: gets the attribute classes of a given module :)
-) else if(matches($exist:path,'/[a-z]+/[\da-zA-Z-_\.]+/[\da-zA-Z-_\.]+/attClasses.json$')) then (
+) else if(matches($exist:path,'/[a-z]+/[\da-zA-Z\-_\.]+/[\da-zA-Z\-_\.]+/attClasses.json$')) then (
     
     response:set-header("Access-Control-Allow-Origin", "*"),
     
@@ -45,7 +45,7 @@ if(matches($exist:path,'/[a-z]+/[\da-zA-Z-_\.]+/modules.json$')) then (
     </dispatch>
     
 (: gets the attributes of a given element :)
-) else if(matches($exist:path,'/[a-z]+/[\da-zA-Z-_\.]+/[\da-zA-Z-_\.]+/atts.json$')) then (
+) else if(matches($exist:path,'/[a-z]+/[\da-zA-Z\-_\.]+/[\da-zA-Z\-_\.]+/atts.json$')) then (
     
     response:set-header("Access-Control-Allow-Origin", "*"),
     
