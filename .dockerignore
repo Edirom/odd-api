@@ -1,0 +1,8 @@
+/build
+/dist
+/node_modules
+/existConfig.json
+.idea/
+.DS_Store
+.github/
+.git/
