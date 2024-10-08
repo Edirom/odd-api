@@ -3,7 +3,7 @@
 # 1. set up the build environment and build the expath-package
 # 2. run the eXist-db
 #########################
-FROM node:22 as builder
+FROM node:22 AS builder
 
 ENV ODDAPI_BUILD_HOME="/opt/oddapi-build"
 
@@ -23,7 +23,7 @@ FROM stadlerpeter/existdb
 
 # For more details about the options see  
 # https://github.com/peterstadler/existdb-docker
-LABEL maintainer="Johannes Kepper and Peter Stadler" \
+LABEL org.opencontainers.image.authors="Johannes Kepper and Peter Stadler" \
       org.opencontainers.image.source="https://github.com/Edirom/odd-api"
 ENV EXIST_ENV="production"
 ENV EXIST_CONTEXT_PATH="/"
