@@ -22,10 +22,10 @@ Some examples for MEI:
 
 … and for TEI:
 
-* `/tei/4.7.0/modules.json`
-* `/tei/4.7.0/header/elements.json`
-* `/tei/4.7.0/header/attClasses.json`
-* `/tei/4.7.0/abbr/atts.json`
+* `/tei/4.8.0/modules.json`
+* `/tei/4.8.0/header/elements.json`
+* `/tei/4.8.0/header/attClasses.json`
+* `/tei/4.8.0/abbr/atts.json`
 
 It will return JSON with the corresponding information. If 
 you want to support additional, ODD-based formats, just create the 
