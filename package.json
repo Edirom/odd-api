@@ -1,6 +1,6 @@
 {
   "name": "odd-api",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "This is a small exist-db app which makes the ODD structures of an MEI or TEI document available through a REST api",
   "main": "index.js",
   "scripts": {
