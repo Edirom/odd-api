@@ -1,0 +1,172 @@
+openapi: 3.0.0
+info:
+  title: ODD API
+  description: A Web API for ODD (TEI or MEI) information
+  version: 1.0.0
+servers:
+  - url: https://odd-api.edirom.de
+    description: API Server
+  - url: http://localhost:8080
+    description: Local development server
+components:
+  parameters:
+    schemaParam:
+      name: schema
+      in: path
+      required: true
+      description: The schema type (TEI or MEI)
+      schema:
+        type: string
+        enum: [mei, tei]
+    versionParam:
+      name: version
+      in: path
+      required: true
+      description: The schema version (e.g., 5.0, 4.0.1)
+      schema:
+        type: string
+  schemas:
+    ModuleList:
+      type: array
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          desc:
+            type: string
+          elementCount:
+            type: integer
+          attClassCount:
+            type: integer
+    ElementList:
+      type: object
+      properties:
+        elements:
+          type: array
+          items:
+            type: object
+            properties:
+              ident:
+                type: string
+              desc:
+                type: string
+              module:
+                type: string
+    AttributeClassList:
+      type: object
+      properties:
+        attClasses:
+          type: array
+          items:
+            type: object
+            properties:
+              ident:
+                type: string
+              desc:
+                type: string
+              module:
+                type: string
+    AttributeList:
+      type: object
+      properties:
+        attributes:
+          type: array
+          items:
+            type: object
+            properties:
+              ident:
+                type: string
+              desc:
+                type: string
+              datatype:
+                type: string
+              usage:
+                type: string
+paths:
+  /{schema}/{version}/modules.json:
+    get:
+      summary: List all modules
+      parameters:
+        - $ref: '#/components/parameters/schemaParam'
+        - $ref: '#/components/parameters/versionParam'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModuleList'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /{schema}/{version}/{classname}/elements.json:
+    get:
+      summary: List all elements of a class
+      parameters:
+        - $ref: '#/components/parameters/schemaParam'
+        - $ref: '#/components/parameters/versionParam'
+        - name: classname
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ElementList'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /{schema}/{version}/{classname}/attClasses.json:
+    get:
+      summary: List all attribute classes
+      parameters:
+        - $ref: '#/components/parameters/schemaParam'
+        - $ref: '#/components/parameters/versionParam'
+        - name: classname
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeClassList'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /{schema}/{version}/{elementname}/atts.json:
+    get:
+      summary: List all attributes of an element
+      parameters:
+        - $ref: '#/components/parameters/schemaParam'
+        - $ref: '#/components/parameters/versionParam'
+        - name: elementname
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributeList'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
