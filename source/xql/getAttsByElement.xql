@@ -10,12 +10,13 @@ import module namespace config="http://odd-api.edirom.de/xql/config" at "config.
 
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace request="http://exist-db.org/xquery/request";
-declare namespace util="http://exist-db.org/xquery/util";
-declare namespace transform="http://exist-db.org/xquery/transform";
 declare namespace response="http://exist-db.org/xquery/response";
 declare namespace local="no:link";
 
-declare option exist:serialize "method=json media-type=application/json";
+declare namespace output = "http://www.w3.org/2010/xslt-xquery-serialization";
+
+declare option output:media-type "application/json";
+declare option output:method "json";
 
 declare function local:getIdentAndDesc($obj as node()) as map(*) {
     let $ident := $obj/data(@ident)
@@ -68,5 +69,3 @@ let $classes := local:getClasses($element,$odd.source)
     
 return 
     $classes
-
-
