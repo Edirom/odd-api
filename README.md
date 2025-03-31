@@ -7,25 +7,25 @@ This is a small web application that provides information about an ODD
 
 The API offers the following endpoints:
 
-* `/{mei|tei}/{$version}/modules.json`
-* `/{mei|tei}/{$version}/{$classname}/elements.json`
-* `/{mei|tei}/{$version}/{$classname}/attClasses.json`
-* `/{mei|tei}/{$version}/{$elementname}/atts.json`
+* `/v1/{mei|tei}/{$version}/modules.json`
+* `/v1/{mei|tei}/{$version}/{$module}/elements.json`
+* `/v1/{mei|tei}/{$version}/{$module}/attClasses.json`
+* `/v1/{mei|tei}/{$version}/{$elementname}/atts.json`
 
 Some examples for MEI:
 
-* `/mei/5.0/modules.json`
-* `/mei/4.0.1/modules.json`
-* `/mei/5.0/MEI.cmn/elements.json` 
-* `/mei/5.0/MEI.cmn/attClasses.json`
-* `/mei/4.0.1/bracketSpan/atts.json` 
+* `/v1/mei/5.0/modules.json`
+* `/v1/mei/4.0.1/modules.json`
+* `/v1/mei/5.0/MEI.cmn/elements.json` 
+* `/v1/mei/5.0/MEI.cmn/attClasses.json`
+* `/v1/mei/4.0.1/bracketSpan/atts.json` 
 
 … and for TEI:
 
-* `/tei/4.8.0/modules.json`
-* `/tei/4.8.0/header/elements.json`
-* `/tei/4.8.0/header/attClasses.json`
-* `/tei/4.8.0/abbr/atts.json`
+* `/v1/tei/4.8.0/modules.json`
+* `/v1/tei/4.8.0/header/elements.json`
+* `/v1/tei/4.8.0/header/attClasses.json`
+* `/v1/tei/4.8.0/abbr/atts.json`
 
 It will return JSON with the corresponding information. If 
 you want to support additional, ODD-based formats, just create the 

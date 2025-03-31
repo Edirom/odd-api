@@ -1,0 +1,166 @@
+xquery version "3.1";
+
+(:~
+ : Common module for the ODD API with shared utility functions
+ :)
+module namespace common="http://odd-api.edirom.de/xql/common";
+
+declare namespace http="http://expath.org/ns/http-client";
+declare namespace rest="http://exquery.org/ns/restxq";
+declare namespace tei="http://www.tei-c.org/ns/1.0";
+
+import module namespace config="http://odd-api.edirom.de/xql/config" at "config.xqm";
+
+(:~
+ : Standard response headers for all API responses, including CORS configuration
+ :)
+declare variable $common:response-headers :=
+    <rest:response>
+        <http:response>
+            <http:header name="Access-Control-Allow-Origin" value="*"/>
+        </http:response>
+    </rest:response>;
+
+(:~
+ : Sets a response header with total record count
+ : @param $response-headers The existing response headers
+ : @param $totalrecordcount The total number of records
+ : @return Updated response headers with total record count
+ :)
+declare function common:set-response-header-totalrecordcount($response-headers as element(rest:response), $totalrecordcount as xs:nonNegativeInteger) as element(rest:response) {
+    element {$response-headers/name()} {
+        $response-headers/@*,
+        element {$response-headers/http:response/name()} {
+            $response-headers/http:response/* except $response-headers/http:response/http:header[@name = 'totalrecordcount'],
+            <http:header name="totalrecordcount" value="{$totalrecordcount}"/>
+        }
+    }
+};
+
+(:~
+ : Sets the HTTP status code in response headers
+ : @param $response-headers The existing response headers
+ : @param $status The HTTP status code to set
+ : @return Updated response headers with new status
+ :)
+declare function common:set-status($response-headers as element(rest:response), $status as xs:integer) as element(rest:response) {
+    element {$response-headers/name()} {
+        $response-headers/@*,
+        element {$response-headers/http:response/name()} {
+            $response-headers/http:response/@* except $response-headers/http:response/@status,
+            attribute status {
+                $status
+            },
+            $response-headers/http:response/*
+        }
+    }
+};
+
+(:~
+ : Calculates a limit value for pagination
+ : @param $limit The requested limit
+ : @return A positive integer limit value, bounded by config:max-limit
+ :)
+declare function common:get-limit($limit as xs:string*) as xs:positiveInteger {
+    if($limit[1] castable as xs:positiveInteger)
+    then min(($config:max-limit, xs:positiveInteger($limit[1]))) cast as xs:positiveInteger
+    else $config:max-limit
+};
+
+(:~
+ : Calculates an offset value for pagination
+ : @param $offset The requested offset
+ : @return A positive integer offset value, defaulting to 1
+ :)
+declare function common:get-offset($offset as xs:string*) as xs:positiveInteger {
+    if($offset[1] castable as xs:positiveInteger)
+    then xs:positiveInteger($offset[1])
+    else 1
+};
+
+(:~
+ : Extracts description and gloss from a specification element
+ : @param $spec The TEI element containing desc and gloss elements
+ : @param $docLang Language code for documentation (e.g., "en")
+ : @return A map with 'ident', 'desc', 'gloss', 'type', 'namespace', and 'module' entries
+ :)
+declare function common:get-spec-basic-data($spec as element(), $docLang as xs:string) as map(*) {
+    let $desc := $spec/tei:desc[@xml:lang = $docLang] => normalize-space()
+    let $gloss := $spec/tei:gloss[@xml:lang = $docLang] => normalize-space()
+    let $module := $spec/data(@module)
+    let $type :=
+        if($spec/@type = 'atts') then 'attributeClass'
+        else if($spec/@type = 'model') then 'modelClass'
+        else fn:substring-before($spec/fn:local-name(), 'Spec')
+    let $namespace := $spec/data(@ns)
+    let $spec-basic-data :=
+        map {
+            'ident': $spec/data(@ident),
+            'desc': $desc,
+            'type': $type
+        }
+    return
+        switch($type)
+        case 'element' return
+            map:merge(($spec-basic-data, map {
+                'gloss': $gloss,
+                'module': $module,
+                'namespace': $namespace
+            }))
+        case 'attributeClass' case 'modelClass' return
+            map:merge(($spec-basic-data, map {
+                'module': $module
+            }))
+        default return $spec-basic-data
+};
+
+(:~
+ : Retrieves the ODD source document based on schema and version
+ : @param $schema The schema identifier (e.g., "tei" or "mei")
+ : @param $version The schema version (e.g., "5.0")
+ : @return The TEI document containing the ODD specification
+ :)
+declare function common:odd-source($schema as xs:string, $version as xs:string) as element(tei:TEI) {
+   collection(string-join(($config:data-root, $schema, $version), '/'))//tei:TEI
+};
+
+(:~
+ : Determines the namespace for a specification element
+ : @param $spec The TEI specification element
+ : @return The namespace URI as string, or default TEI namespace if not specified
+ :)
+declare %private function common:work-out-namespace($spec as element()) as xs:string? {
+    if($spec/@ns)
+    then $spec/data(@ns)
+    else
+        if($spec/ancestor::tei:schemaSpec/@ns)
+        then $spec/ancestor::tei:schemaSpec/data(@ns)
+        else 'http://www.tei-c.org/ns/1.0'
+};
+
+declare function common:build-absolute-uri($hostname as function(*), $scheme as function(*), $port as function(*), $path-segments as xs:anyAtomicType+) as xs:string? {
+    let $host := $hostname()
+    let $scheme := $scheme()
+    let $port := $port()
+    let $path := string-join($path-segments, '/') => replace('/+', '/') => replace('^/','')
+    return
+        if($port = 80 or $port = 443)
+        then concat($scheme, '://', $host, '/', $path)
+        else concat($scheme, '://', $host, ':', $port, '/', $path)
+};
+
+declare function common:get-direct-attributes-v1(
+    $spec as element(),
+    $docLang as xs:string
+    ) as array(*) {
+        let $atts :=
+            for $attDef in $spec//tei:attDef
+            let $spec-basic-data := common:get-spec-basic-data($attDef, $docLang)
+            return
+                map {
+                    'name': $spec-basic-data?ident,
+                    'desc': $spec-basic-data?desc
+                }
+        return
+            array { $atts } => array:sort((), function($att) {$att?name})
+};

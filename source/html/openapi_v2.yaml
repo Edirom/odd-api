@@ -1,0 +1,140 @@
+openapi: 3.0.0
+info:
+  title: ODD API
+  description: A Web API for ODD (TEI or MEI) information
+  version: 2.0.0
+servers:
+  - url: https://odd-api.edirom.de/v2
+    description: Official ODD-API Server
+  - url: http://localhost:8080/v2
+    description: Local development server
+components:
+  parameters:
+    schemaParam:
+      name: schema
+      in: path
+      required: true
+      description: The schema type (TEI or MEI)
+      examples:
+        mei:
+          summary: MEI schema
+          value: mei
+        tei:
+          summary: TEI schema
+          value: tei
+      schema:
+        type: string
+    versionParam:
+      name: version
+      in: path
+      required: true
+      description: The schema version (e.g., 5.0, 4.0.1)
+      schema:
+        type: string
+    moduleParam:
+      name: module
+      in: path
+      required: true
+      description: The module name (e.g., header, analysis)
+      examples:
+        header:
+          summary: Header module (TEI)
+          value: header
+        analysis:
+          summary: Analysis module (TEI)
+          value: analysis
+        analytical:
+          summary: Analytical module (MEI)
+          value: MEI.analytical
+      schema:
+        type: string
+    docLangParam:
+      name: docLang
+      in: query
+      required: false
+      description: The language of the documentation
+      examples:
+        en:
+          summary: English
+          value: en
+        de:
+          summary: German
+          value: de
+      schema:
+        type: string
+  schemas:
+    jsonApiTopLevel:
+      allOf:
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/dataObj'
+        - $ref: '#/components/schemas/selfLink'
+    selfLink:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+    dataObj:
+      allOf:
+        - type: object
+          properties:
+            type:
+              type: string
+            id:
+              type: string
+        - $ref: '#/components/schemas/selfLink'
+paths:
+  /schemas:
+    get:
+      summary: List all available schemas
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/jsonApiTopLevel'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /{schema}:
+    get:
+      summary: List all available versions for a schema
+      parameters:
+        - $ref: '#/components/parameters/schemaParam'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/vnd.api+json:
+              schema:
+                $ref: '#/components/schemas/jsonApiTopLevel'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /{schema}/{version}:
+    get:
+      summary: Get a version for a schema
+      parameters:
+        - $ref: '#/components/parameters/schemaParam'
+        - $ref: '#/components/parameters/versionParam'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/xml:
+              schema:
+                type: string
+                format: xml
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error

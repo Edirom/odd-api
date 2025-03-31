@@ -19,15 +19,14 @@ RUN npm install \
 # Now running the eXist-db
 # and adding our freshly built xar-package
 #########################
-FROM stadlerpeter/existdb
+FROM stadlerpeter/existdb:6-jre11
 
 # For more details about the options see  
 # https://github.com/peterstadler/existdb-docker
 LABEL org.opencontainers.image.authors="Johannes Kepper and Peter Stadler" \
       org.opencontainers.image.source="https://github.com/Edirom/odd-api"
-ENV EXIST_ENV="production"
+ENV EXIST_ENV="restxq"
 ENV EXIST_CONTEXT_PATH="/"
-ENV EXIST_DEFAULT_APP_PATH="xmldb:exist:///db/apps/odd-api"
 
 # simply copy our xar package
 # to the eXist-db autodeploy folder

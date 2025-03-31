@@ -1,0 +1,183 @@
+openapi: 3.0.0
+info:
+  title: ODD API
+  description: A Web API for ODD (TEI or MEI) information
+  version: 1.0.0
+servers:
+  - url: https://odd-api.edirom.de/v1
+    description: Official ODD-API Server
+  - url: http://localhost:8080/v1
+    description: Local development server
+components:
+  parameters:
+    schemaParam:
+      name: schema
+      in: path
+      required: true
+      description: The schema type (TEI or MEI)
+      schema:
+        type: string
+        enum: [mei, tei]
+    versionParam:
+      name: version
+      in: path
+      required: true
+      description: The schema version (e.g., 5.0, 4.0.1)
+      schema:
+        type: string
+    moduleParam:
+      name: module
+      in: path
+      required: true
+      description: The module name (e.g., header, analysis)
+      examples:
+        header:
+          summary: Header module (TEI)
+          value: header
+        analysis:
+          summary: Analysis module (TEI)
+          value: analysis
+        analytical:
+          summary: Analytical module (MEI)
+          value: MEI.analytical
+      schema:
+        type: string
+    docLangParam:
+      name: docLang
+      in: query
+      required: false
+      description: The language of the documentation
+      examples:
+        en:
+          summary: English
+          value: en
+        de:
+          summary: German
+          value: de
+      schema:
+        type: string
+  schemas:
+    moduleList:
+      type: array
+      items:
+        allOf:
+          - $ref: '#/components/schemas/specBasicData'
+          - type: object
+            properties:
+              elementCount:
+                type: integer
+              attClassCount:
+                type: integer
+    elementList:
+      type: array
+      items:
+        $ref: '#/components/schemas/specBasicData'
+    attributeClassList:
+      type: array
+      items:
+        $ref: '#/components/schemas/specBasicData'
+    attributeList:
+      allOf:
+        - $ref: '#/components/schemas/specBasicData'
+        - type: object
+          properties:
+            module:
+              type: string
+            atts:
+              type: array
+              items:
+                $ref: '#/components/schemas/specBasicData'
+            classes:
+              type: array
+              items:
+                $ref: '#/components/schemas/attributeList'
+    specBasicData:
+      type: object
+      properties:
+        name:
+          type: string
+        desc:
+          type: string
+paths:
+  /{schema}/{version}/modules.json:
+    get:
+      summary: List all modules
+      parameters:
+        - $ref: '#/components/parameters/schemaParam'
+        - $ref: '#/components/parameters/versionParam'
+        - $ref: '#/components/parameters/docLangParam'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/moduleList'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /{schema}/{version}/{module}/elements.json:
+    get:
+      summary: List all elements of a module
+      parameters:
+        - $ref: '#/components/parameters/schemaParam'
+        - $ref: '#/components/parameters/versionParam'
+        - $ref: '#/components/parameters/docLangParam'
+        - $ref: '#/components/parameters/moduleParam'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/elementList'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /{schema}/{version}/{module}/attClasses.json:
+    get:
+      summary: List all classes of a module
+      parameters:
+        - $ref: '#/components/parameters/schemaParam'
+        - $ref: '#/components/parameters/versionParam'
+        - $ref: '#/components/parameters/docLangParam'
+        - $ref: '#/components/parameters/moduleParam'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/attributeClassList'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /{schema}/{version}/{elementname}/atts.json:
+    get:
+      summary: List all attributes of an element
+      parameters:
+        - $ref: '#/components/parameters/schemaParam'
+        - $ref: '#/components/parameters/versionParam'
+        - $ref: '#/components/parameters/docLangParam'
+        - name: elementname
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/attributeList'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error

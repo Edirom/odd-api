@@ -32,6 +32,9 @@ declare variable $config:repo-descriptor := doc(concat($config:app-root, "/repo.
 
 declare variable $config:expath-descriptor := doc(concat($config:app-root, "/expath-pkg.xml"))/expath:package;
 
+(: maximum for the limit parameter :)
+declare variable $config:max-limit := 200;
+
 (:~
  :  Grab the ODD source
  :)
