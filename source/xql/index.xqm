@@ -119,7 +119,7 @@ declare
                 xmldb:get-child-collections($config:data-root)
                 ! map {
                     'type': 'schemas',
-                    'id': .,
+                    'id': 'schema_' || .,
                     'links': map {
                         'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, (rest:base-uri(), 'v2', .))
                     }
@@ -144,7 +144,11 @@ declare
                 xmldb:get-child-collections($config:data-root || '/' || $schema)
                 ! map {
                     'type': 'versions',
-                    'id': .,
+                    'id': 'schema_' || $schema || '_' || .,
+                    'attributes': map {
+                        'schema': $schema,
+                        'version': .
+                    },
                     'links': map {
                         'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, (rest:base-uri(), 'v2', $schema, .))
                     }
