@@ -1,0 +1,13 @@
+get:
+  summary: List all available schemas
+  responses:
+    '200':
+      description: Successful operation
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: ../components/schemas/jsonApiTopLevel.yaml
+    '400':
+      description: Bad request
+    '500':
+      description: Internal server error

@@ -1,0 +1,13 @@
+name: docLang
+in: query
+required: false
+description: The language of the documentation
+examples:
+  en:
+    summary: English
+    value: en
+  de:
+    summary: German
+    value: de
+schema:
+  type: string

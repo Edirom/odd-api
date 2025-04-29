@@ -1,0 +1,17 @@
+get:
+  summary: Get a version for a schema
+  parameters:
+    - $ref: ../components/parameters/schemaParam.yaml
+    - $ref: ../components/parameters/versionParam.yaml
+  responses:
+    '200':
+      description: Successful operation
+      content:
+        application/xml:
+          schema:
+            type: string
+            format: xml
+    '400':
+      description: Bad request
+    '500':
+      description: Internal server error

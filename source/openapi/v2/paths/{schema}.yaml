@@ -1,0 +1,15 @@
+get:
+  summary: List all available versions for a schema
+  parameters:
+    - $ref: ../components/parameters/schemaParam.yaml
+  responses:
+    '200':
+      description: Successful operation
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: ../components/schemas/jsonApiTopLevel.yaml
+    '400':
+      description: Bad request
+    '500':
+      description: Internal server error

@@ -1,0 +1,13 @@
+name: schema
+in: path
+required: true
+description: The schema type (TEI or MEI)
+examples:
+  mei:
+    summary: MEI schema
+    value: mei
+  tei:
+    summary: TEI schema
+    value: tei
+schema:
+  type: string

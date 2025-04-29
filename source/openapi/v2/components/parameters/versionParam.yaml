@@ -1,0 +1,6 @@
+name: version
+in: path
+required: true
+description: The schema version (e.g., 5.0, 4.0.1)
+schema:
+  type: string

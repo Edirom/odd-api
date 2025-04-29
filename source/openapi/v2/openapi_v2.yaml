@@ -1,0 +1,17 @@
+openapi: 3.0.0
+info:
+  title: ODD API
+  description: A Web API for ODD (TEI or MEI) information
+  version: 2.0.0
+servers:
+  - url: https://odd-api.edirom.de/v2
+    description: Official ODD-API Server
+  - url: http://localhost:8080/v2
+    description: Local development server
+paths:
+  /schemas:
+    $ref: paths/schemas.yaml
+  /{schema}:
+    $ref: paths/{schema}.yaml
+  /{schema}/{version}:
+    $ref: paths/{schema}_{version}.yaml

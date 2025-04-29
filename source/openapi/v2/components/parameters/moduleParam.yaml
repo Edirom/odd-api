@@ -1,0 +1,16 @@
+name: module
+in: path
+required: true
+description: The module name (e.g., header, analysis)
+examples:
+  header:
+    summary: Header module (TEI)
+    value: header
+  analysis:
+    summary: Analysis module (TEI)
+    value: analysis
+  analytical:
+    summary: Analytical module (MEI)
+    value: MEI.analytical
+schema:
+  type: string
