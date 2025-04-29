@@ -1,0 +1,16 @@
+get:
+  summary: Get a list of modules for a version of a schema
+  parameters:
+    - $ref: ../components/parameters/schemaParam.yaml
+    - $ref: ../components/parameters/versionParam.yaml
+  responses:
+    '200':
+      description: Successful operation
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: ../components/schemas/jsonApiTopLevel.yaml
+    '400':
+      description: Bad request
+    '500':
+      description: Internal server error

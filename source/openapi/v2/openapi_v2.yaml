@@ -15,3 +15,5 @@ paths:
     $ref: paths/{schema}.yaml
   /{schema}/{version}:
     $ref: paths/{schema}_{version}.yaml
+  /{schema}/{version}/modules:
+    $ref: paths/{schema}_{version}_modules.yaml
