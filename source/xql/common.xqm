@@ -164,3 +164,15 @@ declare function common:get-direct-attributes-v1(
         return
             array { $atts } => array:sort((), function($att) {$att?name})
 };
+
+(:~
+ : Generates a JSON API identifier based on type, schema, version, and identifier
+ : @param $type The type of the resource (e.g., "element", "module")
+ : @param $schema The schema identifier (e.g., "tei", "mei")
+ : @param $version The schema version (e.g., "5.0")
+ : @param $ident The identifier of the resource
+ : @return A string representing the JSON API identifier
+ :)
+declare function common:jsonapi-identifier($type as xs:string, $schema as xs:string, $version as xs:string, $ident as xs:string) as xs:string {
+    string-join(($type, $schema, $version, $ident), '_')
+};
