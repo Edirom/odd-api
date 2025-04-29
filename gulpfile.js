@@ -80,6 +80,33 @@ gulp.task('xar-structure', function() {
     
 });
 
+// simply copies the openapi v1 file to the build folder
+gulp.task('openapi_v1', function(){
+    return gulp.src('./source/openapi/v1/openapi_v1.yaml')
+        .pipe(gulp.dest('./build/'));
+});
+
+// bundles the v2 openapi file using redocly and saves it to the build folder
+gulp.task('openapi_v2', function (done) {
+    const { exec } = require('child_process');
+
+    // create the target folder
+    const outputDir = './build';
+    if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    // run redocly to bundle the OpenAPI description
+    exec('npx @redocly/cli bundle source/openapi/v2/openapi_v2.yaml -o build/openapi_v2.yaml', (err, stdout, stderr) => {
+        if (err) {
+            console.error('Failed to bundle the OpenAPI description: ', stderr);
+            done(err);
+            return;
+        }
+        done();
+    });
+});
+
 //empty build folder
 gulp.task('del', function() {
     return del(['./build/**/*','./dist/' + packageJson.name + '-' + getPackageJsonVersion() + '.xar']);
@@ -99,7 +126,7 @@ gulp.task('dist-finish', function() {
 })
 
 //creates a dist version
-gulp.task('dist', gulp.series('xar-structure', 'html', 'xql', 'data', 'dist-finish', function (done) {
+gulp.task('dist', gulp.series('xar-structure', 'html', 'xql', 'data', 'openapi_v1', 'openapi_v2', 'dist-finish', function (done) {
     done();
 }));
 
@@ -114,7 +141,7 @@ function getGitInfo() {
             dirty: git.isDirty()}
 }
 
-gulp.task('git-info',function() {
+gulp.task('git-info', function() {
     console.log('Git Information: ')
     console.log(git.short());
     console.log(git.remoteUrl());
