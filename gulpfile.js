@@ -32,21 +32,6 @@ gulp.task('deploy-xql', gulp.series('xql', function (done) {
     done();
 }));
 
-gulp.task('controller', function(){
-    return gulp.src('source/exist-db/controller.xql')
-        .pipe(newer('build/'))
-        .pipe(gulp.dest('build/'));
-});
-
-//deploys controller.xql to exist-db
-gulp.task('deploy-controller',gulp.series('controller', function(done) {
-    gulp.src(['controller.xql'], {cwd: 'build/'})
-        .pipe(existClient.newer({target: "/db/apps/odd-api/"}))
-        .pipe(existClient.dest({target: '/db/apps/odd-api/'}));
-        
-    done();
-}));
-
 //handles html
 gulp.task('html', function(){
     
@@ -65,7 +50,6 @@ gulp.task('deploy-html', gulp.series('html', function(done) {
     gulp.src('**/*.html', {cwd: './build/'})
         .pipe(existClient.newer({target: "/db/apps/odd-api/"}))
         .pipe(existClient.dest({target: '/db/apps/odd-api/'}));
-
 done();
 }));
 
@@ -104,7 +88,7 @@ gulp.task('del', function() {
 /**
  * deploys the current build folder into a (local) exist database
  */
-/*gulp.task('deploy', gulp.series('deploy-data', 'deploy-html', 'deploy-xql', 'deploy-controller', function (done) {
+/*gulp.task('deploy', gulp.series('deploy-data', 'deploy-html', 'deploy-xql', function (done) {
     done();
 }));*/
 
