@@ -101,11 +101,6 @@ gulp.task('del', function() {
     return del(['./build/**/*','./dist/' + packageJson.name + '-' + getPackageJsonVersion() + '.xar']);
 });
 
-//reading from fs as this prevents caching problems    
-function getPackageJsonVersion() {
-    return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
-}
- 
 /**
  * deploys the current build folder into a (local) exist database
  */
