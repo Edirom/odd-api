@@ -1,19 +1,20 @@
-var gulp = require('gulp');
-var zip = require('gulp-zip');
-var replace = require('gulp-replace');
-var newer = require('gulp-newer');
-var exist = require('@existdb/gulp-exist');
-var dateformat = require('dateformat');
-var fs = require('fs');
+const gulp = require('gulp');
+const zip = require('gulp-zip');
+const replace = require('gulp-replace');
+const newer = require('gulp-newer');
+const exist = require('@existdb/gulp-exist');
+const dateformat = require('dateformat');
+const fs = require('fs');
 
-var packageJson = require('./package.json');
-var existConfig = require('./existConfig.json');
-var existClient = exist.createClient(existConfig);
+const packageJson = require('./package.json');
+const existConfig = require('./existConfig.json');
+const existClient = exist.createClient(existConfig);
 
-var git = require('git-rev-sync');
-var source = require('vinyl-source-stream');
-var buffer = require('vinyl-buffer');
-var runSequence = require('run-sequence').use(gulp);
+const git = require('git-rev-sync');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+const del = require("del");
+const runSequence = require('run-sequence').use(gulp);
 
 //handles xqueries
 gulp.task('xql', function(){
