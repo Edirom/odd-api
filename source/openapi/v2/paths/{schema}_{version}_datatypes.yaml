@@ -1,5 +1,5 @@
 get:
-  summary: Get a list of modules for a version of a schema
+  summary: Get a list of datatypes for a version of a schema
   parameters:
     - $ref: ../components/parameters/schemaParam.yaml
     - $ref: ../components/parameters/versionParam.yaml

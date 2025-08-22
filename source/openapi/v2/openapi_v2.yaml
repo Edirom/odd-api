@@ -7,7 +7,7 @@ servers:
   - url: https://odd-api.edirom.de/v2
     description: Official ODD-API Server
   - url: http://localhost:8080/v2
-    description: Local development server
+    description: Local ODD-API development server
 paths:
   /schemas:
     $ref: paths/schemas.yaml
@@ -15,5 +15,15 @@ paths:
     $ref: paths/{schema}.yaml
   /{schema}/{version}:
     $ref: paths/{schema}_{version}.yaml
+  /{schema}/{version}/attributes: #really?
+    $ref: paths/{schema}_{version}_attributes.yaml
+  /{schema}/{version}/classes:
+    $ref: paths/{schema}_{version}_classes.yaml
+  /{schema}/{version}/datatypes:
+    $ref: paths/{schema}_{version}_datatypes.yaml
+  /{schema}/{version}/elements:
+    $ref: paths/{schema}_{version}_elements.yaml
+  /{schema}/{version}/macros:
+    $ref: paths/{schema}_{version}_macros.yaml
   /{schema}/{version}/modules:
     $ref: paths/{schema}_{version}_modules.yaml

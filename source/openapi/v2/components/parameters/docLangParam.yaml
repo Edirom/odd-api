@@ -1,7 +1,9 @@
 name: docLang
 in: query
 required: false
-description: The language of the documentation
+description: |-
+  The language of the documentation.
+  If specified, only the matching resources will be returned.
 examples:
   en:
     summary: English
