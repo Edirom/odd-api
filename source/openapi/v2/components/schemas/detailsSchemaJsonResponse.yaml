@@ -12,6 +12,7 @@ allOf:
                   type: string
                 id:
                   type: string
+                  description: The unique identifier as required be the JSON:API specification
                 attributes:
                   type: object
                   properties:
