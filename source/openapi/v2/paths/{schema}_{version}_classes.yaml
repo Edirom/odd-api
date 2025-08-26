@@ -1,16 +1,17 @@
 get:
   summary: Get a list of classes for a version of a schema
   parameters:
-    - $ref: ../components/parameters/schemaParam.yaml
-    - $ref: ../components/parameters/versionParam.yaml
-    - $ref: ../components/parameters/docLangParam.yaml
+    - $ref: "../components/parameters/schemaParam.yaml"
+    - $ref: "../components/parameters/versionParam.yaml"
+    - $ref: "../components/parameters/docLangParam.yaml"
+    - $ref: "../components/parameters/moduleParam.yaml"
   responses:
     '200':
       description: Successful operation
       content:
         application/vnd.api+json:
           schema:
-            $ref: ../components/schemas/jsonApiTopLevel.yaml
+            $ref: "../components/schemas/shallowListJsonResponse.yaml"
     '400':
       description: Bad request
     '500':

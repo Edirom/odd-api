@@ -1,0 +1,53 @@
+allOf:
+  - type: object
+    properties:
+      data:
+        type: array
+        items:
+          type: object
+          allOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - attributes
+                    - classes
+                    - datatypes
+                    - elements
+                    - macros
+                    - modules
+                id:
+                  type: string
+                attributes:
+                  type: object
+                  properties:
+                    identifier:
+                      type: string
+                      description: The identifier as provided by the `@ident` attribute in the ODD
+                    gloss:
+                      type: array
+                      items:
+                        type: object
+                        description: The gloss as provided by the `gloss` element in the ODD
+                        properties:
+                          lang:
+                            type: string
+                            description: The language code (e.g. "en", "de", "fr")
+                          text:
+                            type: string
+                            description: The gloss text
+                    description:
+                      type: array
+                      items:
+                        type: object
+                        description: The description as provided by the `desc` element in the ODD
+                        properties:
+                            lang:
+                              type: string
+                              description: The language code (e.g. "en", "de", "fr")
+                            text:
+                              type: string
+                              description: The description text
+            - $ref: ./selfLink.yaml
+  - $ref: ./selfLink.yaml

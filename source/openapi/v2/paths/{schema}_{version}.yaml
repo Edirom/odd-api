@@ -1,16 +1,23 @@
 get:
   summary: Get a version for a schema
   parameters:
-    - $ref: ../components/parameters/schemaParam.yaml
-    - $ref: ../components/parameters/versionParam.yaml
+    - $ref: "../components/parameters/schemaParam.yaml"
+    - $ref: "../components/parameters/versionParam.yaml"
   responses:
     '200':
-      description: Successful operation
+      description: |-
+        Successful operation.
+        The response can be either in XML format or JSON:API format.
+        XML will return the raw ODD schema in TEI-XML format while
+        JSON:API will return a JSON representation of the schema metadata, i.e. a "fingerprint" of the schema.
       content:
         application/xml:
           schema:
             type: string
             format: xml
+        application/vnd.api+json:
+          schema:
+            $ref: "../components/schemas/detailsSchemaJsonResponse.yaml"
     '400':
       description: Bad request
     '500':

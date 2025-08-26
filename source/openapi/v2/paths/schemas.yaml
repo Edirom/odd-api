@@ -6,7 +6,7 @@ get:
       content:
         application/vnd.api+json:
           schema:
-            $ref: ../components/schemas/jsonApiTopLevel.yaml
+            $ref: "../components/schemas/shallowSchemaJsonResponse.yaml"
     '400':
       description: Bad request
     '500':

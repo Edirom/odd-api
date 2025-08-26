@@ -1,0 +1,56 @@
+allOf:
+  - type: object
+    properties:
+      data:
+        type: array
+        items:
+          type: object
+          allOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                id:
+                  type: string
+                attributes:
+                  type: object
+                  properties:
+                    identifier:
+                      type: string
+                      description: The identifier for the schema (e.g. "tei_all")
+                    version:
+                      type: string
+                      description: The version of the schema (e.g. "3.3.0")
+                    releaseDate:
+                      type: string
+                      format: date
+                      description: The release date of the schema (e.g. "2021-11-30")
+                    description:
+                      type: string
+                      description: A short description of the schema version
+                    url:
+                      type: string
+                      format: uri
+                      description: A URL to the official documentation of the schema
+                    defaultNamespace:
+                      type: string
+                      format: uri
+                      description: The default namespace of the schema (e.g. "http://www.tei-c.org/ns/1.0")
+                    elements:
+                      type: array
+                      description: A list of all element names defined in this schema
+                      items:
+                        type: string
+                    attributes:
+                      type: array
+                      description: A list of all attribute names defined in this schema
+                      items:
+                        type: string
+                    teiDistance:
+                      type: integer
+                      description: The distance of this schema from the latest TEI version
+                    meiDistance:
+                      type: integer
+                      description: The distance of this schema from the latest MEI version
+            - $ref: ./selfLink.yaml
+  - $ref: ./selfLink.yaml

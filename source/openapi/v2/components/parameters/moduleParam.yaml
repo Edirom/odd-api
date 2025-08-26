@@ -1,6 +1,6 @@
 name: module
-in: path
-required: true
+in: query
+required: false
 description: The module name (e.g., header, analysis)
 examples:
   header:

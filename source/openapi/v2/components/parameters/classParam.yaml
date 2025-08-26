@@ -1,0 +1,19 @@
+name: class
+in: query
+required: false
+description: The class name (e.g., model.divLike, att.global)
+examples:
+  model.divLike:
+    summary: model.divLike (TEI)
+    description: groups elements used to represent un-numbered generic structural divisions
+    value: model.divLike
+  att.global:
+    summary: att.global (TEI)
+    description: provides attributes common to all elements in the TEI encoding scheme
+    value: att.global
+  att.keyMode:
+    summary: att.keyMode (MEI)
+    description: Attributes for describing key mode
+    value: att.keyMode
+schema:
+  type: string
