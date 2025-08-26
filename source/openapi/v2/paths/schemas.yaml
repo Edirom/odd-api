@@ -11,3 +11,20 @@ get:
       description: Bad request
     '500':
       description: Internal server error
+post:
+    summary: Analyze a schema from a provided ODD file
+    requestBody:
+      required: true
+      content:
+        application/octet-stream: {}
+    responses:
+      '200':
+        description: Successful operation
+        content:
+          application/vnd.api+json:
+            schema:
+              $ref: "../components/schemas/detailsSchemaJsonResponse.yaml"
+      '400':
+        description: Bad request
+      '500':
+        description: Internal server error
