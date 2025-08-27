@@ -4,3 +4,4 @@
 /existConfig.json
 .idea/
 .DS_Store
+*.xpr
