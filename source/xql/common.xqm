@@ -8,6 +8,7 @@ module namespace common="http://odd-api.edirom.de/xql/common";
 declare namespace http="http://expath.org/ns/http-client";
 declare namespace rest="http://exquery.org/ns/restxq";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
+declare namespace xmldb="http://exist-db.org/xquery/xmldb";
 
 import module namespace config="http://odd-api.edirom.de/xql/config" at "config.xqm";
 
@@ -120,8 +121,11 @@ declare function common:get-spec-basic-data($spec as element(), $docLang as xs:s
  : @param $version The schema version (e.g., "5.0")
  : @return The TEI document containing the ODD specification
  :)
-declare function common:odd-source($schema as xs:string, $version as xs:string) as element(tei:TEI) {
-   collection(string-join(($config:data-root, $schema, $version), '/'))//tei:TEI
+declare function common:odd-source($schema as xs:string, $version as xs:string) as element(tei:TEI)? {
+    if(xmldb:collection-available(string-join(($config:data-root, $schema, $version), '/')))
+    then
+        collection(string-join(($config:data-root, $schema, $version), '/'))//tei:TEI[1]
+    else ()
 };
 
 (:~
@@ -129,7 +133,7 @@ declare function common:odd-source($schema as xs:string, $version as xs:string) 
  : @param $spec The TEI specification element
  : @return The namespace URI as string, or default TEI namespace if not specified
  :)
-declare %private function common:work-out-namespace($spec as element()) as xs:string? {
+declare function common:work-out-namespace($spec as element()?) as xs:string {
     if($spec/@ns)
     then $spec/data(@ns)
     else
@@ -175,4 +179,18 @@ declare function common:get-direct-attributes-v1(
  :)
 declare function common:jsonapi-identifier($type as xs:string, $schema as xs:string, $version as xs:string, $ident as xs:string) as xs:string {
     string-join(($type, $schema, $version, $ident), '_')
+};
+
+declare function common:error-not-found($detail as xs:string, $source as xs:string) as map(*) {
+    map {
+        'errors':
+            array {
+                map {
+                    'status': '404',
+                    'title': 'Resource not found',
+                    'detail': $detail,
+                    'source': $source
+                }
+            }
+    }
 };
