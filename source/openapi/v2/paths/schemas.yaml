@@ -17,7 +17,9 @@ post:
     requestBody:
       required: true
       content:
-        application/octet-stream: {}
+        application/xml: {}
+        application/tei+xml: {}
+        text/xml: {}
     responses:
       '200':
         description: Successful operation

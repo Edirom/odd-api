@@ -154,6 +154,8 @@ declare
     %rest:POST("{$request-body}")
     %rest:path("/v2/schemas")
     %rest:consumes("application/xml")
+    %rest:consumes("application/tei+xml")
+    %rest:consumes("text/xml")
     %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
