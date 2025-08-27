@@ -19,11 +19,11 @@ allOf:
                     - modules
                 id:
                   type: string
-                  description: The unique identifier as required be the JSON:API specification
+                  description: The unique identifier as required by the JSON:API specification
                 attributes:
                   type: object
                   properties:
-                    identifier:
+                    ident:
                       type: string
                       description: The identifier as provided by the `@ident` attribute in the ODD
                     gloss:

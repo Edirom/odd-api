@@ -13,15 +13,17 @@ allOf:
                   default: schemas
                 id:
                   type: string
-                  description: The unique identifier as required be the JSON:API specification
+                  description: The unique identifier as required by the JSON:API specification
                 attributes:
                   type: object
                   properties:
-                    identifier:
+                    ident:
                       type: string
                       description: The identifier for the schema (e.g. "tei_all")
-                    version:
-                      type: string
-                      description: The version of the schema (e.g. "3.3.0")
+                    versions:
+                      type: array
+                      description: The available versions of this schema (e.g. "3.3.0")
+                      items:
+                        type: string
             - $ref: ./selfLink.yaml
   - $ref: ./selfLink.yaml

@@ -10,13 +10,14 @@ allOf:
               properties:
                 type:
                   type: string
+                  default: schemaDetails
                 id:
                   type: string
-                  description: The unique identifier as required be the JSON:API specification
+                  description: The unique identifier as required by the JSON:API specification
                 attributes:
                   type: object
                   properties:
-                    identifier:
+                    ident:
                       type: string
                       description: The identifier for the schema (e.g. "tei_all")
                     version:
@@ -25,14 +26,10 @@ allOf:
                     releaseDate:
                       type: string
                       format: date
-                      description: The release date of the schema (e.g. "2021-11-30")
-                    description:
+                      description: The release date of the schema as provided by a `date` element in the `editionStmt` element of the ODD
+                    title:
                       type: string
-                      description: A short description of the schema version
-                    url:
-                      type: string
-                      format: uri
-                      description: A URL to the official documentation of the schema
+                      description: The title of the schema version as provided by the `titleStmt/title` element in the ODD
                     defaultNamespace:
                       type: string
                       format: uri
