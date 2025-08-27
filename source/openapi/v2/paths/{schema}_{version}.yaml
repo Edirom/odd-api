@@ -11,14 +11,20 @@ get:
         XML will return the raw ODD schema in TEI-XML format while
         JSON:API will return a JSON representation of the schema metadata, i.e. a "fingerprint" of the schema.
       content:
+        application/vnd.api+json:
+          schema:
+            $ref: "../components/schemas/detailsSchemaJsonResponse.yaml"
         application/xml:
           schema:
             type: string
             format: xml
-        application/vnd.api+json:
-          schema:
-            $ref: "../components/schemas/detailsSchemaJsonResponse.yaml"
     '400':
       description: Bad request
+    '404':
+      description: Resource not found
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: "../components/schemas/errorNotFound.yaml"
     '500':
       description: Internal server error

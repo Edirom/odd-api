@@ -1,5 +1,6 @@
 get:
-  summary: List all available schemas
+  summary: List all available top level schema labels
+  description: Shallow schema information is provided for each available schema label, e.g. "tei_all", or "mei_cmm"
   responses:
     '200':
       description: Successful operation

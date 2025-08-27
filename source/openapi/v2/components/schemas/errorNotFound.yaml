@@ -1,0 +1,21 @@
+type: object
+properties:
+  errors:
+    type: array
+    items:
+      type: object
+      properties:
+        status:
+          type: string
+          default: "404"
+        title:
+          type: string
+          example: "Resource not found"
+        detail:
+          type: string
+          example: "The requested resource could not be found."
+        source:
+          type: object
+          properties:
+            pointer:
+              type: string

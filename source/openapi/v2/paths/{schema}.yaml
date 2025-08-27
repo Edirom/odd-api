@@ -1,5 +1,6 @@
 get:
   summary: List all available versions for a schema
+  description: A shallow list of available versions of this schemas will be returned
   parameters:
     - $ref: "../components/parameters/schemaParam.yaml"
   responses:
@@ -11,5 +12,11 @@ get:
             $ref: "../components/schemas/shallowSchemaJsonResponse.yaml"
     '400':
       description: Bad request
+    '404':
+      description: Resource not found
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: "../components/schemas/errorNotFound.yaml"
     '500':
       description: Internal server error

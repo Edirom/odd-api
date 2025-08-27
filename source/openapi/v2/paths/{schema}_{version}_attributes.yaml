@@ -14,5 +14,11 @@ get:
             $ref: "../components/schemas/shallowListJsonResponse.yaml"
     '400':
       description: Bad request
+    '404':
+      description: Resource not found
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: "../components/schemas/errorNotFound.yaml"
     '500':
       description: Internal server error
