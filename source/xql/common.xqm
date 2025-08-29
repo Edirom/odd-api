@@ -8,6 +8,7 @@ module namespace common="http://odd-api.edirom.de/xql/common";
 declare namespace http="http://expath.org/ns/http-client";
 declare namespace rest="http://exquery.org/ns/restxq";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
+declare namespace util="http://exist-db.org/xquery/util";
 declare namespace xmldb="http://exist-db.org/xquery/xmldb";
 
 import module namespace config="http://odd-api.edirom.de/xql/config" at "config.xqm";
@@ -85,26 +86,33 @@ declare function common:get-offset($offset as xs:string*) as xs:positiveInteger 
  : @param $docLang Language code for documentation (e.g., "en")
  : @return A map with 'ident', 'desc', 'gloss', 'type', 'namespace', and 'module' entries
  :)
-declare function common:get-spec-basic-data($spec as element(), $docLang as xs:string) as map(*) {
-    let $desc := $spec/tei:desc[@xml:lang = $docLang] => normalize-space()
-    let $gloss := $spec/tei:gloss[@xml:lang = $docLang] => normalize-space()
+declare function common:get-spec-basic-data($spec as element(), $docLang as xs:string*) as map(*) {
     let $module := $spec/data(@module)
     let $type :=
         if($spec/@type = 'atts') then 'attributeClass'
         else if($spec/@type = 'model') then 'modelClass'
         else fn:substring-before($spec/fn:local-name(), 'Spec')
-    let $namespace := $spec/data(@ns)
+    let $namespace := common:work-out-namespace($spec)
     let $spec-basic-data :=
         map {
             'ident': $spec/data(@ident),
-            'desc': $desc,
-            'type': $type
+            'desc':
+                array {
+                    if($docLang)
+                    then $spec/tei:desc[@xml:lang = $docLang] ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
+                    else $spec/tei:desc ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
+                } => array:sort((), function($obj) {$obj?lang})
         }
     return
         switch($type)
         case 'element' return
             map:merge(($spec-basic-data, map {
-                'gloss': $gloss,
+                'gloss':
+                    array {
+                        if($docLang)
+                        then $spec/tei:gloss[@xml:lang = $docLang] ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
+                        else $spec/tei:gloss ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
+                    } => array:sort((), function($obj) {$obj?lang}),
                 'module': $module,
                 'namespace': $namespace
             }))
