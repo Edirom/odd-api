@@ -64,7 +64,7 @@ declare %private function modules:get-modules-v2($schema as xs:string, $version 
         let $spec-basic-data := common:get-spec-basic-data($module, 'en')
         let $elementCount := count($odd-source//tei:elementSpec[@module = $spec-basic-data?ident])
         let $attClassCount := count($odd-source//tei:classSpec[@type = 'atts'][@module = $spec-basic-data?ident])
-        let $id := common:jsonapi-identifier('modules', $schema, $version, $spec-basic-data?ident)
+        let $id := common:encode-jsonapi-id($schema, $version, 'modules', $spec-basic-data?ident)
         return
             map {
                 'type': 'modules',

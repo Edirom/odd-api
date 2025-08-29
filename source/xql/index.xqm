@@ -212,7 +212,7 @@ declare
                     return
                     map {
                         'type': 'schemas',
-                        'id': 'schema_' || $schema || '_' || $version,
+                        'id': common:encode-jsonapi-id($schema, $version, (), ()),
                         'attributes': map {
                             'ident': $schema,
                             'versions':
@@ -281,7 +281,7 @@ declare
                         array {
                             map {
                                 'type': 'schemaDetails',
-                                'id': 'schema_' || $schema || '_' || $version,
+                                'id': common:encode-jsonapi-id($schema, $version, (), ()),
                                 'attributes': map:merge((
                                     map {
                                         'ident': $schema,

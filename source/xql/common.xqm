@@ -170,15 +170,38 @@ declare function common:get-direct-attributes-v1(
 };
 
 (:~
- : Generates a JSON API identifier based on type, schema, version, and identifier
- : @param $type The type of the resource (e.g., "element", "module")
+ : Generates a JSON API identifier based on schema, version, resource type and identifier
+ :
  : @param $schema The schema identifier (e.g., "tei", "mei")
  : @param $version The schema version (e.g., "5.0")
+ : @param $resource The type of the resource (e.g., "element", "module")
  : @param $ident The identifier of the resource
  : @return A string representing the JSON API identifier
  :)
-declare function common:jsonapi-identifier($type as xs:string, $schema as xs:string, $version as xs:string, $ident as xs:string) as xs:string {
-    string-join(($type, $schema, $version, $ident), '_')
+declare function common:encode-jsonapi-id(
+    $schema as xs:string,
+    $version as xs:string?,
+    $resource as xs:string?,
+    $ident as xs:string?) as xs:string {
+        string-join(($schema, $version, $resource, $ident), '&#xE000;')
+        => util:base64-encode()
+};
+
+(:~
+ : Decodes a JSON API identifier into its components: schema, version, resource type, and identifier
+ :
+ : @param $id The JSON API identifier string
+ : @return A map with keys 'schema', 'version', 'resource', and 'ident'
+ :)
+declare function common:decode-jsonapi-id($id as xs:string) as map(*) {
+    let $parts := $id => util:base64-decode() => tokenize('&#xE000;')
+    return
+        map {
+            'schema': $parts[1],
+            'version': if(count($parts) >= 2) then $parts[2] else (),
+            'resource': if(count($parts) >= 3) then $parts[3] else (),
+            'ident': if(count($parts) >= 4) then $parts[4] else ()
+        }
 };
 
 declare function common:error-not-found($detail as xs:string, $source as xs:string) as map(*) {
