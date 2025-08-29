@@ -79,7 +79,7 @@ declare %private function elements:get-elements-v1(
             return
                 map {
                     'name': $spec-basic-data?ident,
-                    'desc': $spec-basic-data?desc
+                    'desc': $spec-basic-data?desc?*[?lang=$docLang]?text
                 }
         return
             array { $elements } => array:sort((), function($elem) {$elem?name})
@@ -102,7 +102,7 @@ declare %private function elements:get-element-attributes-v1(
         return
             map {
                 'name': $spec-basic-data?ident,
-                'desc': $spec-basic-data?desc,
+                'desc': $spec-basic-data?desc?*[?lang=$docLang]?text,
                 'module': $spec-basic-data?module,
                 'atts': $direct-attributes,
                 'classes': classes:get-attribute-classes-recursively-v1($elem, $odd.source, $docLang)
@@ -164,7 +164,7 @@ declare %private function elements:get-element-details(
         return
             if($elementSpec)
             then
-                let $basic-data := common:get-spec-basic-data($elementSpec, $docLang[1])
+                let $basic-data := common:get-spec-basic-data($elementSpec, $docLang)
                 let $attributes := elements:get-element-attributes($odd-source, $elementSpec, $docLang)
                 return
                     map {
