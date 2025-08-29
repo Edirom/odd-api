@@ -1,0 +1,20 @@
+name: id
+in: path
+required: true
+description: |-
+  The identifier of the resource (e.g. element or class).
+  The identifier could either be provided in the short form 
+  as provided by the `@ident` attribute of the ODD (e.g. "ab", "model.pLike") 
+  or as the unique id of this ODD-API (e.g. "tei_3.6.0_element_ab").
+examples:
+  tei1:
+    summary: anonymous block element (TEI)
+    value: ab
+  tei2:
+    summary: model.pLike class (TEI)
+    value: model.pLike
+  mei1:
+    summary: note element (MEI)
+    value: note
+schema:
+  type: string

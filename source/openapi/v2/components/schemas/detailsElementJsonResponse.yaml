@@ -1,0 +1,71 @@
+allOf:
+  - type: object
+    properties:
+      data:
+        type: array
+        items:
+          type: object
+          allOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  default: elementDetails
+                id:
+                  type: string
+                  description: The unique identifier as required by the JSON:API specification
+                attributes:
+                  type: object
+                  properties:
+                    ident:
+                      type: string
+                      description: The identifier for the element (e.g. "span", "p", "note")
+                    gloss:
+                      type: array
+                      items:
+                        type: object
+                        description: The gloss as provided by the `gloss` element in the ODD
+                        properties:
+                          lang:
+                            type: string
+                            description: The language code (e.g. "en", "de", "fr")
+                          text:
+                            type: string
+                            description: The gloss text
+                    desc:
+                      type: array
+                      items:
+                        type: object
+                        description: The description as provided by the `desc` element in the ODD
+                        properties:
+                          lang:
+                            type: string
+                            description: The language code (e.g. "en", "de", "fr")
+                          text:
+                            type: string
+                            description: The description text
+                    namespace:
+                      type: string
+                      description: The namespace URI for this element
+                    attributes:
+                      type: array
+                      description: The attributes available for this element
+                      items:
+                        type: string
+                    classes:
+                      type: array
+                      description: The classes available for this element
+                      items:
+                        type: string
+                    content:
+                      type: array
+                      description: The content model (i.e. the possible child elements) for this element as provided in the ODD
+                      items:
+                        type: string
+                    context:
+                      type: array
+                      description: The context (i.e. the possible parent elements) for this element as provided in the ODD
+                      items:
+                        type: string
+            - $ref: ./selfLink.yaml
+  - $ref: ./selfLink.yaml

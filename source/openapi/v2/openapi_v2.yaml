@@ -23,6 +23,8 @@ paths:
     $ref: paths/{schema}_{version}_datatypes.yaml
   /{schema}/{version}/elements:
     $ref: paths/{schema}_{version}_elements.yaml
+  /{schema}/{version}/elements/{id}:
+    $ref: paths/{schema}_{version}_elements_{id}.yaml
   /{schema}/{version}/macros:
     $ref: paths/{schema}_{version}_macros.yaml
   /{schema}/{version}/modules:
