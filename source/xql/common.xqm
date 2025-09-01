@@ -95,44 +95,44 @@ declare function common:get-spec-basic-data($spec as element(), $docLang as xs:s
     let $type :=
         if($spec/@type = 'atts') then 'attributeClass'
         else if($spec/@type = 'model') then 'modelClass'
+        else if($spec/self::tei:attDef) then 'attribute'
         else fn:substring-before($spec/fn:local-name(), 'Spec')
-    let $namespace := common:work-out-namespace($spec)
+    let $gloss-desc := function($elemName as xs:string) as array(*) {
+        array {
+            if($docLang)
+            then $spec/tei:*[fn:local-name()=$elemName][@xml:lang = $docLang] ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
+            else $spec/tei:*[fn:local-name()=$elemName] ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
+        } => array:sort((), function($obj) {$obj?lang})
+    }
     let $spec-basic-data :=
         map {
             'ident': $spec/data(@ident),
-            'desc':
-                array {
-                    if($docLang)
-                    then $spec/tei:desc[@xml:lang = $docLang] ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
-                    else $spec/tei:desc ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
-                } => array:sort((), function($obj) {$obj?lang})
+            'desc': $gloss-desc('desc')
         }
     return
         switch($type)
         case 'element' return
             map:merge(($spec-basic-data, map {
-                'gloss':
-                    array {
-                        if($docLang)
-                        then $spec/tei:gloss[@xml:lang = $docLang] ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
-                        else $spec/tei:gloss ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
-                    } => array:sort((), function($obj) {$obj?lang}),
+                'gloss': $gloss-desc('gloss'),
                 'module': $module,
-                'namespace': $namespace
+                'namespace': common:work-out-namespace($spec)
             }))
         case 'macro' case 'data' return
             map:merge(($spec-basic-data, map {
-                'gloss':
-                    array {
-                        if($docLang)
-                        then $spec/tei:gloss[@xml:lang = $docLang] ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
-                        else $spec/tei:gloss ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
-                    } => array:sort((), function($obj) {$obj?lang}),
+                'gloss': $gloss-desc('gloss'),
                 'module': $module
             }))
         case 'attributeClass' case 'modelClass' return
             map:merge(($spec-basic-data, map {
                 'module': $module
+            }))
+        case 'attribute' return
+            map:merge(($spec-basic-data, map {
+                'gloss': $gloss-desc('gloss'),
+                'class':
+                    if($spec/ancestor::tei:elementSpec) then 'local'
+                    else $spec/ancestor::tei:classSpec/string(@ident),
+                'namespace': common:work-out-namespace($spec)
             }))
         default return $spec-basic-data
 };
@@ -169,8 +169,10 @@ declare function common:odd-source($schema as xs:string, $version as xs:string) 
 
 (:~
  : Determines the namespace for a specification element
+ : If no namespace is explicitly provided the TEI namespace is assumed for elements
+ : and the empty namespace for attributes
  : @param $spec The TEI specification element
- : @return The namespace URI as string, or default TEI namespace if not specified
+ : @return The namespace URI as string
  :)
 declare function common:work-out-namespace($spec as element()?) as xs:string {
     if($spec/@ns)
@@ -178,6 +180,8 @@ declare function common:work-out-namespace($spec as element()?) as xs:string {
     else
         if($spec/ancestor::tei:schemaSpec/@ns)
         then $spec/ancestor::tei:schemaSpec/data(@ns)
+        else if(starts-with($spec/@ident, 'xml:')) then 'http://www.w3.org/XML/1998/namespace'
+        else if($spec/self::tei:attDef) then ''
         else 'http://www.tei-c.org/ns/1.0'
 };
 

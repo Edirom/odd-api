@@ -2,9 +2,11 @@ xquery version "3.1";
 
 module namespace elements="http://odd-api.edirom.de/xql/elements";
 
+declare namespace array="http://www.w3.org/2005/xpath-functions/array";
 declare namespace err="http://www.w3.org/2005/xqt-errors";
 declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
+declare namespace range="http://exist-db.org/xquery/range";
 declare namespace rest="http://exquery.org/ns/restxq";
 declare namespace req="http://exquery.org/ns/request";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
@@ -155,47 +157,6 @@ declare %private function elements:get-element-attributes-v1(
             ))
 };
 
-declare function elements:get-element-context() {};
-
-declare function elements:get-element-content() {};
-
-(:~
- : Recursive retrieval of all attributes defined directly for an element and
- : all attributes defined in attribute classes the element is member of, including
- : nested attribute classes.
- : Local attributes are marked with 'class': 'local', attributes from attribute classes
- : are marked with 'class': '$className'.
- :
- : @param $odd-source The ODD source document
- : @param $elementSpec The elementSpec element for which to retrieve attributes
- : @return An array of maps with 'name' and 'class' keys
- :)
-declare function elements:get-element-attributes(
-    $odd-source as element(tei:TEI),
-    $elementSpec as element(tei:elementSpec),
-    $docLang as xs:string*
-    ) as array(*) {
-        array {
-            $elementSpec//tei:attDef ! map {
-                'ident': string(./@ident),
-                'class': 'local',
-                'gloss':
-                    array {
-                        if($docLang)
-                        then ./tei:gloss[@xml:lang = $docLang] ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
-                        else ./tei:gloss ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
-                    } => array:sort((), function($obj) {$obj?lang}),
-                'desc':
-                    array {
-                        if($docLang)
-                        then ./tei:desc[@xml:lang = $docLang] ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
-                        else ./tei:desc ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
-                    } => array:sort((), function($obj) {$obj?lang})
-            }
-        }
-        => array:sort((), function($attr) {$attr?name})
-};
-
 declare %private function elements:get-elements-shallow-list(
     $schema as xs:string, $version as xs:string,
     $classParam as xs:string*, $docLangParam as xs:string*,
@@ -210,13 +171,12 @@ declare %private function elements:get-elements-shallow-list(
                 'data': array {
                     for $elementSpec in $elementSpecs
                     let $basic-data := common:get-spec-basic-data($elementSpec, $docLang)
-                    let $attributes := elements:get-element-attributes($odd-source, $elementSpec, $docLang)
                     let $elementIdent := $elementSpec/data(@ident)
                     return
                         map {
                             'type': 'elements',
                             'id': common:encode-jsonapi-id($schema, $version, 'elements', $elementIdent),
-                            'attributes': map:put($basic-data, 'attributes', $attributes),
+                            'attributes': $basic-data,
                             'links': map { 'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, (rest:base-uri(), 'v2', $schema, $version, 'elements', $elementIdent)) }
                         }
                 } => array:sort((), function($obj) {$obj?attributes?ident}),
@@ -239,7 +199,9 @@ declare %private function elements:get-element-details(
             if($elementSpec)
             then
                 let $basic-data := common:get-spec-basic-data($elementSpec, $docLang)
-                let $attributes := elements:get-element-attributes($odd-source, $elementSpec, $docLang)
+                let $attributes :=
+                    array { elements:work-out-attributes($elementSpec, $odd-source, $docLang) }
+                    => array:sort((), function($att) {$att?ident})
                 let $content := elements:work-out-content($elementSpec, $odd-source)
                 return
                     map {
@@ -283,6 +245,26 @@ declare function elements:work-out-content($spec as element()?, $odd-source as e
 };
 
 declare function elements:work-out-class-membership($spec as element()?, $odd-source as element(tei:TEI)) as xs:string* {
-    $odd-source//tei:elementSpec[tei:classes/tei:memberOf[not(@mode='delete')]/@key = $spec/@ident]/@ident,
-    $odd-source//tei:classSpec[tei:classes/tei:memberOf[not(@mode='delete')]/@key = $spec/@ident] ! elements:work-out-class-membership(., $odd-source)
+    $odd-source//tei:memberOf[range:eq(@key, $spec/@ident)]/ancestor::tei:elementSpec/string(@ident),
+    $odd-source//tei:memberOf[range:eq(@key, $spec/@ident)]/ancestor::tei:classSpec ! elements:work-out-class-membership(., $odd-source)
+};
+
+(:~
+ : Recursive retrieval of all attributes defined directly for an element and
+ : all attributes defined in attribute classes the element is member of, including
+ : nested attribute classes.
+ : Local attributes are marked with 'class': 'local', attributes from attribute classes
+ : are marked with their respective class ident.
+ :
+ : @param $odd-source The ODD source document
+ : @param $spec The spec element (classSpec or elementSpec) for which to retrieve attributes
+ : @return A sequence of maps
+ :)
+declare function elements:work-out-attributes(
+    $spec as element()?, $odd-source as element(tei:TEI),
+    $docLang as xs:string*) as map(*)* {
+        $spec//tei:attDef ! common:get-spec-basic-data(., $docLang),
+        for $key in $spec/tei:classes/tei:memberOf/@key[starts-with(.,'att.')]
+        let $class := $odd-source//tei:classSpec[@type = 'atts'][@ident = $key]
+        return elements:work-out-attributes($class, $odd-source, $docLang)
 };
