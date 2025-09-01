@@ -51,7 +51,7 @@ declare
     %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
-    function elements:get-element(
+    function elements:get-elements(
         $schema as xs:string, $version as xs:string,
         $class as xs:string*, $docLang as xs:string*,
         $module as xs:string*
@@ -198,13 +198,13 @@ declare function elements:get-element-attributes(
 
 declare %private function elements:get-elements-shallow-list(
     $schema as xs:string, $version as xs:string,
-    $class as xs:string*, $docLang as xs:string*,
-    $module as xs:string*) as map(*)* {
+    $classParam as xs:string*, $docLangParam as xs:string*,
+    $moduleParam as xs:string*) as map(*)* {
         let $odd-source := common:odd-source($schema, $version)
-        let $classParam := common:extract-query-parameters($class)
-        let $docLangParam := common:extract-query-parameters($docLang)
-        let $moduleParam := common:extract-query-parameters($module)
-        let $elementSpecs := $odd-source//tei:elementSpec => common:filter-by-module($moduleParam) => common:filter-by-class($classParam)
+        let $class := common:extract-query-parameters($classParam)
+        let $docLang := common:extract-query-parameters($docLangParam)
+        let $module := common:extract-query-parameters($moduleParam)
+        let $elementSpecs := $odd-source//tei:elementSpec => common:filter-by-module($module) => common:filter-by-class($class)
         return
             map {
                 'data': array {
