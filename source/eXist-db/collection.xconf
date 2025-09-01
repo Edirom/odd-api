@@ -3,9 +3,11 @@
     <index xmlns:xs="http://www.w3.org/2001/XMLSchema">
         <fulltext default="none" attributes="false"/>
         <range>
-            <create qname="@type" type="xs:string"/>
             <create qname="@ident" type="xs:string"/>
+            <create qname="@key" type="xs:string"/>
+            <create qname="@mode" type="xs:string"/>
             <create qname="@module" type="xs:string"/>
+            <create qname="@type" type="xs:string"/>
         </range>
     </index>
     <triggers>
