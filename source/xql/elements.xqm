@@ -230,11 +230,10 @@ declare function elements:work-out-content($spec as element()?, $odd-source as e
         return
             typeswitch($descendant)
                 case element(tei:classRef) return (
-                    $odd-source//tei:elementSpec[tei:classes/tei:memberOf[not(@mode='delete')] = $descendant/@key]/@ident,
+                    $odd-source//tei:elementSpec[tei:classes/tei:memberOf[not(@mode='delete')]/@key = $descendant/@key]/@ident,
                     $odd-source//tei:classSpec[tei:classes/tei:memberOf[not(@mode='delete')]/@key = $descendant/@key] ! elements:work-out-class-membership(., $odd-source)
                 )
                 case element(tei:elementRef) return $descendant/string(@key)
-                case element(tei:textNode) return 'textNode'
                 case element(tei:macroRef) return
                     $odd-source//tei:macroSpec[@ident = $descendant/@key] => elements:work-out-content($odd-source)
                 case element(tei:empty) return 'empty'
