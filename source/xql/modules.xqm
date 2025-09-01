@@ -45,8 +45,8 @@ declare %private function modules:get-modules-v1($schema as xs:string, $version 
     let $modules :=
         for $module in $odd-source//tei:moduleSpec
         let $spec-basic-data := common:get-spec-basic-data-v1($module, $docLang)
-        let $elementCount := count($odd-source//tei:elementSpec[@module = $spec-basic-data?ident])
-        let $attClassCount := count($odd-source//tei:classSpec[@type = 'atts'][@module = $spec-basic-data?ident])
+        let $elementCount := count($odd-source//tei:elementSpec[@module = $spec-basic-data?name])
+        let $attClassCount := count($odd-source//tei:classSpec[@type = 'atts'][@module = $spec-basic-data?name])
         return
             map:merge((
                 $spec-basic-data,
