@@ -2,6 +2,7 @@ xquery version "3.1";
 
 module namespace classes="http://odd-api.edirom.de/xql/classes";
 
+declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace rest="http://exquery.org/ns/restxq";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
@@ -30,13 +31,7 @@ declare %private function classes:get-attClasses-v1(
         let $odd.source := common:odd-source($schema, $version)
         let $module.replaced := replace($module,'_','.')
         let $classes :=
-            for $class in $odd.source//tei:classSpec[@module = ($module, $module.replaced)][@type = 'atts']
-            let $spec-basic-data := common:get-spec-basic-data($class, $docLang)
-            return
-                map {
-                    'name': $spec-basic-data?ident,
-                    'desc': $spec-basic-data?desc
-                }
+            $odd.source//tei:classSpec[@module = ($module, $module.replaced)][@type = 'atts'] ! common:get-spec-basic-data-v1(., $docLang) ! map:remove(., 'module')
         return
             array { $classes } => array:sort((), function($class) {$class?name})
 };
@@ -49,15 +44,15 @@ declare function classes:get-attribute-classes-recursively-v1(
             for $key in $spec/tei:classes/tei:memberOf/@key[starts-with(.,'att.')]
             let $class := $odd.source//tei:classSpec[@type = 'atts'][@ident = $key]
             let $directAtts := common:get-direct-attributes-v1($class, $docLang)
-            let $spec-basic-data := common:get-spec-basic-data($class, $docLang)
+            let $spec-basic-data := common:get-spec-basic-data-v1($class, $docLang)
             return
-                map {
-                    'name': $spec-basic-data?ident,
-                    'desc': $spec-basic-data?desc,
-                    'module': $spec-basic-data?module,
-                    'atts': $directAtts,
-                    'classes': classes:get-attribute-classes-recursively-v1($class, $odd.source, $docLang)
-                }
+                map:merge((
+                    $spec-basic-data,
+                    map {
+                        'atts': $directAtts,
+                        'classes': classes:get-attribute-classes-recursively-v1($class, $odd.source, $docLang)
+                    }
+                ))
         return
             array { $memberClasses } => array:sort((), function($class) {$class?name})
 };

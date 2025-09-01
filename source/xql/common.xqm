@@ -6,6 +6,7 @@ xquery version "3.1";
 module namespace common="http://odd-api.edirom.de/xql/common";
 
 declare namespace http="http://expath.org/ns/http-client";
+declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 declare namespace rest="http://exquery.org/ns/restxq";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace util="http://exist-db.org/xquery/util";
@@ -126,6 +127,23 @@ declare function common:get-spec-basic-data($spec as element(), $docLang as xs:s
         default return $spec-basic-data
 };
 
+declare function common:get-spec-basic-data-v1($spec as element(), $docLang as xs:string*) as map(*) {
+    let $spec-basic-data := common:get-spec-basic-data($spec, $docLang)
+    return
+        if(map:contains($spec-basic-data, 'module'))
+        then
+            map {
+                'name': $spec-basic-data?ident,
+                'desc': $spec-basic-data?desc?*[?lang=$docLang]?text,
+                'module': $spec-basic-data?module
+            }
+        else
+            map {
+                'name': $spec-basic-data?ident,
+                'desc': $spec-basic-data?desc?*[?lang=$docLang]?text
+            }
+};
+
 (:~
  : Retrieves the ODD source document based on schema and version
  : @param $schema The schema identifier (e.g., "tei" or "mei")
@@ -168,14 +186,7 @@ declare function common:get-direct-attributes-v1(
     $spec as element(),
     $docLang as xs:string
     ) as array(*) {
-        let $atts :=
-            for $attDef in $spec//tei:attDef
-            let $spec-basic-data := common:get-spec-basic-data($attDef, $docLang)
-            return
-                map {
-                    'name': $spec-basic-data?ident,
-                    'desc': $spec-basic-data?desc
-                }
+        let $atts := $spec//tei:attDef ! common:get-spec-basic-data-v1(., $docLang)
         return
             array { $atts } => array:sort((), function($att) {$att?name})
 };

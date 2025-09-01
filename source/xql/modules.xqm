@@ -2,6 +2,7 @@ xquery version "3.1";
 
 module namespace modules="http://odd-api.edirom.de/xql/modules";
 
+declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace rest="http://exquery.org/ns/restxq";
 declare namespace req="http://exquery.org/ns/request";
@@ -43,16 +44,17 @@ declare %private function modules:get-modules-v1($schema as xs:string, $version 
     let $odd-source := common:odd-source($schema, $version)
     let $modules :=
         for $module in $odd-source//tei:moduleSpec
-        let $spec-basic-data := common:get-spec-basic-data($module, $docLang)
+        let $spec-basic-data := common:get-spec-basic-data-v1($module, $docLang)
         let $elementCount := count($odd-source//tei:elementSpec[@module = $spec-basic-data?ident])
         let $attClassCount := count($odd-source//tei:classSpec[@type = 'atts'][@module = $spec-basic-data?ident])
         return
-            map {
-                'name': $spec-basic-data?ident,
-                'desc': $spec-basic-data?desc,
-                'elementCount': $elementCount,
-                'attClassCount': $attClassCount
-            }
+            map:merge((
+                $spec-basic-data,
+                map {
+                    'elementCount': $elementCount,
+                    'attClassCount': $attClassCount
+                }
+            ))
     return
         array { $modules } => array:sort((), function($module) {$module?name})
 };

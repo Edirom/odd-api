@@ -3,6 +3,7 @@ xquery version "3.1";
 module namespace elements="http://odd-api.edirom.de/xql/elements";
 
 declare namespace err="http://www.w3.org/2005/xqt-errors";
+declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace rest="http://exquery.org/ns/restxq";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
@@ -124,13 +125,7 @@ declare %private function elements:get-elements-v1(
         let $odd.source := common:odd-source($schema, $version)
         let $module.replaced := replace($module,'_','.')
         let $elements :=
-            for $elem in $odd.source//tei:elementSpec[@module = ($module, $module.replaced)]
-            let $spec-basic-data := common:get-spec-basic-data($elem, $docLang)
-            return
-                map {
-                    'name': $spec-basic-data?ident,
-                    'desc': $spec-basic-data?desc?*[?lang=$docLang]?text
-                }
+            $odd.source//tei:elementSpec[@module = ($module, $module.replaced)] ! common:get-spec-basic-data-v1(., $docLang) ! map:remove(., 'module')
         return
             array { $elements } => array:sort((), function($elem) {$elem?name})
 };
@@ -147,16 +142,16 @@ declare %private function elements:get-element-attributes-v1(
     ) as map(*) {
         let $odd.source := common:odd-source($schema, $version)
         let $elem := $odd.source//tei:elementSpec[@ident = $element]
-        let $spec-basic-data := common:get-spec-basic-data($elem, $docLang)
+        let $spec-basic-data := common:get-spec-basic-data-v1($elem, $docLang)
         let $direct-attributes := common:get-direct-attributes-v1($elem, $docLang)
         return
-            map {
-                'name': $spec-basic-data?ident,
-                'desc': $spec-basic-data?desc?*[?lang=$docLang]?text,
-                'module': $spec-basic-data?module,
-                'atts': $direct-attributes,
-                'classes': classes:get-attribute-classes-recursively-v1($elem, $odd.source, $docLang)
-            }
+            map:merge((
+                $spec-basic-data,
+                map {
+                    'atts': $direct-attributes,
+                    'classes': classes:get-attribute-classes-recursively-v1($elem, $odd.source, $docLang)
+                }
+            ))
 };
 
 declare function elements:get-element-context() {};
@@ -181,7 +176,7 @@ declare function elements:get-element-attributes(
     ) as array(*) {
         array {
             $elementSpec//tei:attDef ! map {
-                'name': string(./@ident),
+                'ident': string(./@ident),
                 'class': 'local',
                 'gloss':
                     array {
