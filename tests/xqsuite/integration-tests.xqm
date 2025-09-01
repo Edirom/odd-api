@@ -14,7 +14,7 @@ declare
     %test:args('/v2/tei/3.6.0')    %test:assertEquals("data", "links")
     %test:args('/v2/tei/3.6.0/elements')    %test:assertEquals("data", "links")
     %test:args('/v2/tei/4.9.0/modules')    %test:assertEquals("data", "links")
-(:    %test:args('/v2/mei/4.0.1/classes')    %test:assertEquals("data", "links"):)
+    %test:args('/v2/mei/4.0.1/classes')    %test:assertEquals("data", "links")
     %test:args('/v2/tei/3.6.0/elements/span')    %test:assertEquals("data", "links")
     %test:args('/v2/tei/3.6.x')    %test:assertEquals("errors")
     %test:args('/v2/tei/3.6.x/elements')    %test:assertEquals("errors")
@@ -35,7 +35,7 @@ declare
     %test:args('/v2/tei/3.6.0')    %test:assertTrue
     %test:args('/v2/tei/3.6.0/elements')    %test:assertTrue
     %test:args('/v2/tei/4.9.0/modules')    %test:assertTrue
-(:    %test:args('/v2/mei/4.0.1/classes')    %test:assertTrue:)
+    %test:args('/v2/mei/4.0.1/classes')    %test:assertTrue
     %test:args('/v2/tei/3.6.0/elements/span')    %test:assertTrue
     %test:args('/v2/tei/3.6.x')    %test:assertFalse
     %test:args('/v2/tei/3.6.x/elements')    %test:assertFalse
@@ -59,7 +59,7 @@ declare
     %test:args('/v2/tei/3.6.0')    %test:assertEquals("1")
     %test:args('/v2/tei/3.6.0/elements')    %test:assertEquals("576")
     %test:args('/v2/tei/4.9.0/modules')    %test:assertEquals("22")
-(:    %test:args('/v2/mei/4.0.1/classes')    %test:assertEquals("1"):)
+    %test:args('/v2/mei/4.0.1/classes')    %test:assertEquals("826")
     %test:args('/v2/tei/3.6.0/elements/span')    %test:assertEquals("1")
     function it:json-api-data-array-size($endpoint as xs:string) as xs:int {
         let $req :=
