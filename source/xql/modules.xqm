@@ -26,17 +26,33 @@ declare
 declare
     %rest:GET
     %rest:path("/v2/{$schema}/{$version}/modules")
+    %rest:query-param("docLang", "{$docLang}", "")
     %rest:produces("application/json")
     %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
-    function modules:modules-v2($schema as xs:string, $version as xs:string) {
-        $common:response-headers,
-        map {
-            'data': modules:get-modules-v2($schema, $version),
-            'links': map {
-                'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
-            }
+    function modules:get-modules($schema as xs:string, $version as xs:string, $docLang as xs:string*) {
+        try{
+            $common:response-headers,
+            modules:get-modules-shallow-list($schema, $version, $docLang)
+        }
+        catch common:OddNotFoundError {
+            common:set-status($common:response-headers, 404),
+            common:json-api-error-object(
+                $err:description,
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                404,
+                $err:code
+            )
+        }
+        catch * {
+            common:set-status($common:response-headers, 404),
+            common:json-api-error-object(
+                $err:description,
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                404,
+                $err:code
+            )
         }
 };
 
@@ -59,28 +75,31 @@ declare %private function modules:get-modules-v1($schema as xs:string, $version 
         array { $modules } => array:sort((), function($module) {$module?name})
 };
 
-declare %private function modules:get-modules-v2($schema as xs:string, $version as xs:string) as array(*) {
-    let $odd-source := common:odd-source($schema, $version)
-    let $modules :=
-        for $module in $odd-source//tei:moduleSpec
-        let $spec-basic-data := common:get-spec-basic-data($module, 'en')
-        let $elementCount := count($odd-source//tei:elementSpec[@module = $spec-basic-data?ident])
-        let $attClassCount := count($odd-source//tei:classSpec[@type = 'atts'][@module = $spec-basic-data?ident])
-        let $id := common:encode-jsonapi-id($schema, $version, 'modules', $spec-basic-data?ident)
+declare %private function modules:get-modules-shallow-list(
+    $schema as xs:string, $version as xs:string,
+    $docLangParam as xs:string*) as map(*) {
+        let $odd-source := common:odd-source($schema, $version)
+        let $docLang := common:extract-query-parameters($docLangParam)
+        let $modules :=
+            for $module in $odd-source//tei:moduleSpec
+            let $spec-basic-data := common:get-spec-basic-data($module, $docLang)
+(:            let $elementCount := count($odd-source//tei:elementSpec[@module = $spec-basic-data?ident]):)
+(:            let $attClassCount := count($odd-source//tei:classSpec[@type = 'atts'][@module = $spec-basic-data?ident]):)
+            let $id := common:encode-jsonapi-id($schema, $version, 'modules', $spec-basic-data?ident)
+            return
+                map {
+                    'type': 'modules',
+                    'id': $id,
+                    'attributes': $spec-basic-data,
+                    "links": map {
+                        "self": common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri() || '/' || $spec-basic-data?ident)
+                    }
+                }
         return
             map {
-                'type': 'modules',
-                'id': $id,
-                'attributes': map {
-                    'name': $spec-basic-data?ident,
-                    'desc': $spec-basic-data?desc,
-                    'elementCount': $elementCount,
-                    'attClassCount': $attClassCount
-                },
-                "links": map {
-                    "self": common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri() || '/' || $id)
+                'data': array { $modules } => array:sort((), function($module) {$module?attributes?ident}),
+                'links': map {
+                    'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
                 }
             }
-    return
-        array { $modules } => array:sort((), function($module) {$module?id})
 };
