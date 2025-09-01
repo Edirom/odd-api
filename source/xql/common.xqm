@@ -120,6 +120,16 @@ declare function common:get-spec-basic-data($spec as element(), $docLang as xs:s
                 'module': $module,
                 'namespace': $namespace
             }))
+        case 'macro' case 'data' return
+            map:merge(($spec-basic-data, map {
+                'gloss':
+                    array {
+                        if($docLang)
+                        then $spec/tei:gloss[@xml:lang = $docLang] ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
+                        else $spec/tei:gloss ! map { "lang": string(./@xml:lang), "text": normalize-space(.) }
+                    } => array:sort((), function($obj) {$obj?lang}),
+                'module': $module
+            }))
         case 'attributeClass' case 'modelClass' return
             map:merge(($spec-basic-data, map {
                 'module': $module
