@@ -215,18 +215,21 @@ declare function common:decode-jsonapi-id($id as xs:string) as map(*) {
         }
 };
 
-declare function common:error-not-found($detail as xs:string, $source as xs:string) as map(*) {
-    map {
-        'errors':
-            array {
-                map {
-                    'status': '404',
-                    'title': 'Resource not found',
-                    'detail': $detail,
-                    'source': $source
+declare function common:json-api-error-object(
+    $title as xs:string, $source as xs:string,
+    $status as xs:integer?, $code as xs:string?) as map(*) {
+        map {
+            'errors':
+                array {
+                    map {
+                        'code': if($code) then string($code) else 'unknownError',
+                        'detail': 'The OpenAPI documentation of the ODD-API can be found at https://odd-api.edirom.de/v2/index.html. If you find the specification or implementation faulty please file an issue at https://github.com/Edirom/odd-api/issues.',
+                        'source': $source,
+                        'status': if($status) then string($status) else '404',
+                        'title': $title
+                    }
                 }
-            }
-    }
+        }
 };
 
 declare function common:extract-query-parameters($param as xs:string*) as xs:string* {

@@ -186,8 +186,13 @@ declare
                     }
             )
             else (
-                common:set-status($common:response-headers, 404),
-                common:error-not-found('some error occured', common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()))
+                common:set-status($common:response-headers, 400),
+                common:json-api-error-object(
+                    'Bad request. The provided request body could not be identified as a TEI-ODD file.',
+                    common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                    400,
+                    ()
+                )
             )
 };
 
@@ -232,7 +237,12 @@ declare
         )
         else (
             common:set-status($common:response-headers, 404),
-            common:error-not-found('The requested schema "' || $schema || '" could not be found', common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()))
+            common:json-api-error-object(
+                'The requested schema "' || $schema || '" could not be found',
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                404,
+                'InvalidSchema'
+            )
         )
 };
 
@@ -298,16 +308,20 @@ declare
         }
         catch common:OddNotFoundError {
             common:set-status($common:response-headers, 404),
-            common:error-not-found(
+            common:json-api-error-object(
                 $err:description,
-                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                404,
+                $err:code
             )
         }
         catch * {
             common:set-status($common:response-headers, 404),
-            common:error-not-found(
+            common:json-api-error-object(
                 $err:description,
-                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                404,
+                $err:code
             )
         }
 };
@@ -320,9 +334,27 @@ declare
     %output:method("json")
     function index:wrong-endpoint($schema as xs:string, $version as xs:string, $endpoint as xs:string) {
         common:set-status($common:response-headers, 404),
-            common:error-not-found(
-                'The endpoint "' || $endpoint || '" is invalid.',
-                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
+            common:json-api-error-object(
+                'The endpoint "' || rest:uri() || '" is invalid.',
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                404,
+                'InvalidEndpoint'
+            )
+};
+
+declare
+    %rest:GET
+    %rest:path("/v2/{$schema}/{$version}/{$path-segment}/{$endpoint}")
+    %rest:produces("application/vnd.api+json")
+    %output:media-type("application/vnd.api+json")
+    %output:method("json")
+    function index:wrong-endpoint($schema as xs:string, $version as xs:string, $path-segment as xs:string, $endpoint as xs:string) {
+        common:set-status($common:response-headers, 404),
+            common:json-api-error-object(
+                'The endpoint "' || rest:uri() || '" is invalid.',
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                404,
+                'InvalidEndpoint'
             )
 };
 
