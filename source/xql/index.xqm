@@ -2,6 +2,7 @@ xquery version "3.1";
 
 module namespace index="http://odd-api.edirom.de/xql/index";
 
+declare namespace err="http://www.w3.org/2005/xqt-errors";
 declare namespace http="http://expath.org/ns/http-client";
 declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";

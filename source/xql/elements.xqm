@@ -6,6 +6,7 @@ declare namespace err="http://www.w3.org/2005/xqt-errors";
 declare namespace map="http://www.w3.org/2005/xpath-functions/map";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace rest="http://exquery.org/ns/restxq";
+declare namespace req="http://exquery.org/ns/request";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 
 import module namespace common="http://odd-api.edirom.de/xql/common" at "common.xqm";
