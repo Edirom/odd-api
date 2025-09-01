@@ -13,6 +13,9 @@ declare namespace xmldb="http://exist-db.org/xquery/xmldb";
 
 import module namespace config="http://odd-api.edirom.de/xql/config" at "config.xqm";
 
+declare variable $common:ODD_NOT_FOUND_ERROR := QName("http://odd-api.edirom.de/xql/common", "OddNotFoundError");
+declare variable $common:SPEC_NOT_FOUND_ERROR := QName("http://odd-api.edirom.de/xql/common", "SpecNotFoundError");
+
 (:~
  : Standard response headers for all API responses, including CORS configuration
  :)
@@ -133,7 +136,7 @@ declare function common:odd-source($schema as xs:string, $version as xs:string) 
     if(xmldb:collection-available(string-join(($config:data-root, $schema, $version), '/')))
     then
         collection(string-join(($config:data-root, $schema, $version), '/'))//tei:TEI[1]
-    else ()
+    else error($common:ODD_NOT_FOUND_ERROR, 'ODD source not available for the provided combination of schema="' || $schema || '" and version="' || $version || '".')
 };
 
 (:~
@@ -224,4 +227,18 @@ declare function common:error-not-found($detail as xs:string, $source as xs:stri
                 }
             }
     }
+};
+
+declare function common:extract-query-parameters($param as xs:string*) as xs:string* {
+    ($param ! xmldb:decode-uri(.) ! tokenize(., ',') ! normalize-space(.))[.]
+};
+
+declare function common:filter-by-module($specs as element()*, $modules as xs:string*) as element()* {
+    if($modules) then $specs[@module=$modules] | $specs[ancestor::tei:elementSpec/@module=$modules]
+    else $specs
+};
+
+declare function common:filter-by-class($specs as element()*, $classes as xs:string*) as element()* {
+    if($classes) then $specs[tei:classes/tei:memberOf[not(@mode='delete')]/@key=$classes] | $specs[ancestor::tei:classSpec[not(@mode='delete')]/@ident=$classes]
+    else $specs
 };

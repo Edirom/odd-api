@@ -2,6 +2,7 @@ xquery version "3.1";
 
 module namespace elements="http://odd-api.edirom.de/xql/elements";
 
+declare namespace err="http://www.w3.org/2005/xqt-errors";
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace rest="http://exquery.org/ns/restxq";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
@@ -41,6 +42,40 @@ declare
 
 declare
     %rest:GET
+    %rest:path("/v2/{$schema}/{$version}/elements")
+    %rest:query-param("class", "{$class}", "")
+    %rest:query-param("docLang", "{$docLang}", "")
+    %rest:query-param("module", "{$module}", "")
+    %rest:produces("application/vnd.api+json")
+    %output:media-type("application/vnd.api+json")
+    %output:method("json")
+    function elements:get-element(
+        $schema as xs:string, $version as xs:string,
+        $class as xs:string*, $docLang as xs:string*,
+        $module as xs:string*
+        ) {
+            try{
+                $common:response-headers,
+                elements:get-elements-shallow-list($schema, $version, $class, $docLang, $module)
+            }
+            catch common:OddNotFoundError {
+                common:set-status($common:response-headers, 404),
+                common:error-not-found(
+                    $err:description,
+                    common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
+                )
+            }
+            catch * {
+                common:set-status($common:response-headers, 404),
+                common:error-not-found(
+                    $err:description,
+                    common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
+                )
+            }
+};
+
+declare
+    %rest:GET
     %rest:path("/v2/{$schema}/{$version}/elements/{$id}")
     %rest:query-param("docLang", "{$docLang}", "")
     %rest:produces("application/vnd.api+json")
@@ -50,17 +85,24 @@ declare
         $schema as xs:string, $version as xs:string,
         $id as xs:string, $docLang as xs:string*
         ) {
-            let $response := elements:get-element-details($schema, $version, $id, $docLang)
-            return
-                if(exists($response?errors))
-                then (
-                    common:set-status($common:response-headers, 404),
-                    $response
+            try {
+                $common:response-headers,
+                elements:get-element-details($schema, $version, $id, $docLang)
+            }
+            catch common:OddNotFoundError {
+                common:set-status($common:response-headers, 404),
+                common:error-not-found(
+                    $err:description,
+                    common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
                 )
-                else (
-                    $common:response-headers,
-                    $response
+            }
+            catch * {
+                common:set-status($common:response-headers, 404),
+                common:error-not-found(
+                    $err:description,
+                    common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
                 )
+            }
 };
 
 (:~
@@ -150,6 +192,34 @@ declare function elements:get-element-attributes(
         => array:sort((), function($attr) {$attr?name})
 };
 
+declare %private function elements:get-elements-shallow-list(
+    $schema as xs:string, $version as xs:string,
+    $class as xs:string*, $docLang as xs:string*,
+    $module as xs:string*) as map(*)* {
+        let $odd-source := common:odd-source($schema, $version)
+        let $classParam := common:extract-query-parameters($class)
+        let $docLangParam := common:extract-query-parameters($docLang)
+        let $moduleParam := common:extract-query-parameters($module)
+        let $elementSpecs := $odd-source//tei:elementSpec => common:filter-by-module($moduleParam) => common:filter-by-class($classParam)
+        return
+            map {
+                'data': array {
+                    for $elementSpec in $elementSpecs
+                    let $basic-data := common:get-spec-basic-data($elementSpec, $docLang)
+                    let $attributes := elements:get-element-attributes($odd-source, $elementSpec, $docLang)
+                    let $elementIdent := $elementSpec/data(@ident)
+                    return
+                        map {
+                            'type': 'elements',
+                            'id': common:encode-jsonapi-id($schema, $version, 'elements', $elementIdent),
+                            'attributes': map:put($basic-data, 'attributes', $attributes),
+                            'links': map { 'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, (rest:base-uri(), 'v2', $schema, $version, 'elements', $elementIdent)) }
+                        }
+                } => array:sort((), function($obj) {$obj?attributes?ident}),
+                'links': map { 'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()) }
+            }
+};
+
 declare %private function elements:get-element-details(
     $schema as xs:string,
     $version as xs:string,
@@ -168,11 +238,19 @@ declare %private function elements:get-element-details(
                 let $attributes := elements:get-element-attributes($odd-source, $elementSpec, $docLang)
                 return
                     map {
-                        'data': map {
-                            'type': 'elementDetails',
-                            'id': common:encode-jsonapi-id($schema, $version, 'elements', $elementIdent),
-                            'attributes': map:put($basic-data, 'attributes', $attributes)
-                        }
+                        'data': array {
+                            map {
+                                'type': 'elementDetails',
+                                'id': common:encode-jsonapi-id($schema, $version, 'elements', $elementIdent),
+                                'attributes': map:put($basic-data, 'attributes', $attributes),
+                                'links': map { 'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, (rest:base-uri(), 'v2', $schema, $version, 'elements', $elementIdent)) }
+                            }
+                        },
+                        'links': map { 'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()) }
                     }
-            else common:error-not-found('No elementSpec found for ident "' || $elementIdent || '".', common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()))
+            else
+                error(
+                    $common:SPEC_NOT_FOUND_ERROR,
+                    'No elementSpec found for ident "' || $elementIdent || '".'
+                )
 };

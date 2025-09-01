@@ -271,40 +271,60 @@ declare
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function index:get-schema-details-v2($schema as xs:string, $version as xs:string) {
-        let $odd-source := common:odd-source($schema, $version)
-        return
-            if($odd-source)
-            then (
-                $common:response-headers,
-                map {
-                    'data':
-                        array {
-                            map {
-                                'type': 'schemaDetails',
-                                'id': common:encode-jsonapi-id($schema, $version, (), ()),
-                                'attributes': map:merge((
-                                    map {
-                                        'ident': $schema,
-                                        'version': $version
-                                    },
-                                    index:schema-details($odd-source)
-                                )),
-                                'links': map {
-                                    'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, (rest:base-uri(), 'v2', $schema, $version))
-                                }
+        try {
+            $common:response-headers,
+            map {
+                'data':
+                    array {
+                        map {
+                            'type': 'schemaDetails',
+                            'id': common:encode-jsonapi-id($schema, $version, (), ()),
+                            'attributes': map:merge((
+                                map {
+                                    'ident': $schema,
+                                    'version': $version
+                                },
+                                index:schema-details(common:odd-source($schema, $version))
+                            )),
+                            'links': map {
+                                'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, (rest:base-uri(), 'v2', $schema, $version))
                             }
-                        },
-                        'links': map {
-                            'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
                         }
+                    },
+                    'links': map {
+                        'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
                     }
+                }
+        }
+        catch common:OddNotFoundError {
+            common:set-status($common:response-headers, 404),
+            common:error-not-found(
+                $err:description,
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
             )
-            else (
-                common:set-status($common:response-headers, 404),
-                common:error-not-found('The requested version "' || $version || '" for schema "' || $schema || '" could not be found', common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()))
+        }
+        catch * {
+            common:set-status($common:response-headers, 404),
+            common:error-not-found(
+                $err:description,
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
             )
+        }
 };
 
+declare
+    %rest:GET
+    %rest:path("/v2/{$schema}/{$version}/{$endpoint}")
+    %rest:produces("application/vnd.api+json")
+    %output:media-type("application/vnd.api+json")
+    %output:method("json")
+    function index:wrong-endpoint($schema as xs:string, $version as xs:string, $endpoint as xs:string) {
+        common:set-status($common:response-headers, 404),
+            common:error-not-found(
+                'The endpoint "' || $endpoint || '" is invalid.',
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
+            )
+};
 
 declare %private function index:redirect-to-default-index-html() as document-node(element(rest:response)) {
     index:redirect('/v1/index.html')
