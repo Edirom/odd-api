@@ -240,13 +240,16 @@ declare %private function elements:get-element-details(
             then
                 let $basic-data := common:get-spec-basic-data($elementSpec, $docLang)
                 let $attributes := elements:get-element-attributes($odd-source, $elementSpec, $docLang)
+                let $content := elements:work-out-content($elementSpec, $odd-source)
                 return
                     map {
                         'data': array {
                             map {
                                 'type': 'elementDetails',
                                 'id': common:encode-jsonapi-id($schema, $version, 'elements', $elementIdent),
-                                'attributes': map:put($basic-data, 'attributes', $attributes),
+                                'attributes':
+                                    map:put($basic-data, 'attributes', $attributes)
+                                    => map:put('content', $content),
                                 'links': map { 'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, (rest:base-uri(), 'v2', $schema, $version, 'elements', $elementIdent)) }
                             }
                         },
@@ -257,4 +260,29 @@ declare %private function elements:get-element-details(
                     $common:SPEC_NOT_FOUND_ERROR,
                     'No elementSpec found for ident "' || $elementIdent || '".'
                 )
+};
+
+declare function elements:work-out-content($spec as element()?, $odd-source as element(tei:TEI)) as array(*) {
+    array {(
+        for $descendant in $spec/tei:content//*
+        return
+            typeswitch($descendant)
+                case element(tei:classRef) return (
+                    $odd-source//tei:elementSpec[tei:classes/tei:memberOf[not(@mode='delete')] = $descendant/@key]/@ident,
+                    $odd-source//tei:classSpec[tei:classes/tei:memberOf[not(@mode='delete')]/@key = $descendant/@key] ! elements:work-out-class-membership(., $odd-source)
+                )
+                case element(tei:elementRef) return $descendant/string(@key)
+                case element(tei:textNode) return 'textNode'
+                case element(tei:macroRef) return
+                    $odd-source//tei:macroSpec[@ident = $descendant/@key] => elements:work-out-content($odd-source)
+                case element(tei:empty) return 'empty'
+                case element(tei:anyElement) return 'anyElement'
+                default return ()
+    ) => distinct-values()
+    } => array:sort()
+};
+
+declare function elements:work-out-class-membership($spec as element()?, $odd-source as element(tei:TEI)) as xs:string* {
+    $odd-source//tei:elementSpec[tei:classes/tei:memberOf[not(@mode='delete')]/@key = $spec/@ident]/@ident,
+    $odd-source//tei:classSpec[tei:classes/tei:memberOf[not(@mode='delete')]/@key = $spec/@ident] ! elements:work-out-class-membership(., $odd-source)
 };
