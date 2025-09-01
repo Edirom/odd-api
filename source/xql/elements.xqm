@@ -9,6 +9,7 @@ declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace range="http://exist-db.org/xquery/range";
 declare namespace rest="http://exquery.org/ns/restxq";
 declare namespace req="http://exquery.org/ns/request";
+declare namespace rng="http://relaxng.org/ns/structure/1.0";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 
 import module namespace common="http://odd-api.edirom.de/xql/common" at "common.xqm";
@@ -234,6 +235,13 @@ declare function elements:work-out-content($spec as element()?, $odd-source as e
                     $odd-source//tei:classSpec[tei:classes/tei:memberOf[not(@mode='delete')]/@key = $descendant/@key] ! elements:work-out-class-membership(., $odd-source)
                 )
                 case element(tei:elementRef) return $descendant/string(@key)
+                case element(rng:ref) return
+                    if($descendant/@name => starts-with('model.'))
+                    then (
+                        $odd-source//tei:elementSpec[tei:classes/tei:memberOf[not(@mode='delete')]/@key = $descendant/@name]/@ident,
+                        $odd-source//tei:classSpec[tei:classes/tei:memberOf[not(@mode='delete')]/@key = $descendant/@name] ! elements:work-out-class-membership(., $odd-source)
+                    )
+                    else $descendant/string(@name)
                 case element(tei:macroRef) return
                     $odd-source//tei:macroSpec[@ident = $descendant/@key] => elements:work-out-content($odd-source)
                 case element(tei:empty) return 'empty'
