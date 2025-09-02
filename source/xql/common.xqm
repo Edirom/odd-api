@@ -14,8 +14,17 @@ declare namespace xmldb="http://exist-db.org/xquery/xmldb";
 
 import module namespace config="http://odd-api.edirom.de/xql/config" at "config.xqm";
 
+(:~
+ : Error definitions
+ :)
 declare variable $common:ODD_NOT_FOUND_ERROR := QName("http://odd-api.edirom.de/xql/common", "OddNotFoundError");
 declare variable $common:SPEC_NOT_FOUND_ERROR := QName("http://odd-api.edirom.de/xql/common", "SpecNotFoundError");
+
+(:~
+ : ODDs that define the base line for distance measures
+ :)
+declare variable $common:tei-base-odd := common:odd-source('tei', '4.10.1');
+declare variable $common:mei-base-odd := common:odd-source('mei', '5.1');
 
 (:~
  : Standard response headers for all API responses, including CORS configuration
@@ -269,4 +278,18 @@ declare function common:filter-by-module($specs as element()*, $modules as xs:st
 declare function common:filter-by-class($specs as element()*, $classes as xs:string*) as element()* {
     if($classes) then $specs[tei:classes/tei:memberOf[not(@mode='delete')]/@key=$classes] | $specs[ancestor::tei:classSpec[not(@mode='delete')]/@ident=$classes]
     else $specs
+};
+
+declare function common:compute-odd-distance(
+    $odd-source1 as element(tei:TEI), $odd-source2 as element(tei:TEI)
+    ) as xs:integer {
+        if(deep-equal($odd-source1, $odd-source2)) then 0
+        else
+        (
+            for $elem in $odd-source1//tei:elementSpec | $odd-source2//tei:elementSpec
+            group by $ident := $elem/@ident
+            return
+                if(count($elem) = 1) then 1
+                else 0
+        ) => sum()
 };

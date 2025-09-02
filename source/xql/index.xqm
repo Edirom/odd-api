@@ -381,7 +381,7 @@ declare %private function index:schema-details($odd-source as element(tei:TEI)) 
         'defaultNamespace': common:work-out-namespace($odd-source//tei:schemaSpec[1]),
         'elements': array { $odd-source//tei:elementSpec/data(@ident) => sort() },
         'attributes': array { $odd-source//tei:attDef/@ident => distinct-values() => sort() },
-        'teiDistance': '',
-        'meiDistance': ''
+        'teiDistance': common:compute-odd-distance($odd-source, $common:tei-base-odd),
+        'meiDistance': common:compute-odd-distance($odd-source, $common:mei-base-odd)
     }
 };
