@@ -18,7 +18,6 @@ import module namespace classes="http://odd-api.edirom.de/xql/classes" at "class
 declare
     %rest:GET
     %rest:path("/v1/{$schema}/{$version}/{$module}/elements.json")
-    %rest:produces("application/json")
     %rest:query-param("docLang", "{$docLang}", "en")
     %output:media-type("application/json")
     %output:method("json")
@@ -33,7 +32,6 @@ declare
 declare
     %rest:GET
     %rest:path("/v1/{$schema}/{$version}/{$element}/atts.json")
-    %rest:produces("application/json")
     %rest:query-param("docLang", "{$docLang}", "en")
     %output:media-type("application/json")
     %output:method("json")
@@ -51,7 +49,6 @@ declare
     %rest:query-param("class", "{$class}", "")
     %rest:query-param("docLang", "{$docLang}", "")
     %rest:query-param("module", "{$module}", "")
-    %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function elements:get-elements(
@@ -87,7 +84,6 @@ declare
     %rest:GET
     %rest:path("/v2/{$schema}/{$version}/elements/{$id}")
     %rest:query-param("docLang", "{$docLang}", "")
-    %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function elements:get-element(

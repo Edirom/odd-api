@@ -16,8 +16,6 @@ declare
     %rest:path("/v2/{$schema}/{$version}/macros")
     %rest:query-param("docLang", "{$docLang}", "")
     %rest:query-param("module", "{$module}", "")
-    %rest:produces("application/json")
-    %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function macros:get-macros($schema as xs:string, $version as xs:string, $docLang as xs:string*, $module as xs:string*) {

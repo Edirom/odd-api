@@ -14,7 +14,6 @@ import module namespace config="http://odd-api.edirom.de/xql/config" at "config.
 declare
     %rest:GET
     %rest:path("/v1/{$schema}/{$version}/modules.json")
-    %rest:produces("application/json")
     %rest:query-param("docLang", "{$docLang}", "en")
     %output:media-type("application/json")
     %output:method("json")
@@ -27,8 +26,6 @@ declare
     %rest:GET
     %rest:path("/v2/{$schema}/{$version}/modules")
     %rest:query-param("docLang", "{$docLang}", "")
-    %rest:produces("application/json")
-    %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function modules:get-modules($schema as xs:string, $version as xs:string, $docLang as xs:string*) {

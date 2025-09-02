@@ -88,7 +88,6 @@ declare
 declare
     %rest:GET
     %rest:path("/v1/openapi.yaml")
-    %rest:produces("application/yaml")
     %output:media-type("application/yaml")
     %output:method("text")
     function index:swagger-ui-v1() {
@@ -102,7 +101,6 @@ declare
 declare
     %rest:GET
     %rest:path("/v2/openapi.yaml")
-    %rest:produces("application/yaml")
     %output:media-type("application/yaml")
     %output:method("text")
     function index:swagger-ui-v2() {
@@ -117,7 +115,6 @@ declare
 declare
     %rest:GET
     %rest:path("/v2/schemas")
-    %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function index:list-schemas-v2() {
@@ -157,7 +154,6 @@ declare
     %rest:consumes("application/xml")
     %rest:consumes("application/tei+xml")
     %rest:consumes("text/xml")
-    %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function index:post-schema-v2($request-body as document-node()) {
@@ -204,7 +200,6 @@ declare
 declare
     %rest:GET
     %rest:path("/v2/{$schema}")
-    %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function index:list-schema-versions-v2($schema as xs:string) {
@@ -255,6 +250,7 @@ declare
     %rest:GET
     %rest:path("/v2/{$schema}/{$version}")
     %rest:produces("application/xml")
+    %rest:produces("application/tei+xml")
     %output:media-type("application/xml")
     %output:method("xml")
     function index:get-odd-source-v2($schema as xs:string, $version as xs:string) {
@@ -278,7 +274,6 @@ declare
 declare
     %rest:GET
     %rest:path("/v2/{$schema}/{$version}")
-    %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function index:get-schema-details-v2($schema as xs:string, $version as xs:string) {
@@ -330,7 +325,6 @@ declare
 declare
     %rest:GET
     %rest:path("/v2/{$schema}/{$version}/{$endpoint}")
-    %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function index:wrong-endpoint($schema as xs:string, $version as xs:string, $endpoint as xs:string) {
@@ -346,7 +340,6 @@ declare
 declare
     %rest:GET
     %rest:path("/v2/{$schema}/{$version}/{$path-segment}/{$endpoint}")
-    %rest:produces("application/vnd.api+json")
     %output:media-type("application/vnd.api+json")
     %output:method("json")
     function index:wrong-endpoint($schema as xs:string, $version as xs:string, $path-segment as xs:string, $endpoint as xs:string) {
