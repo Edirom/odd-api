@@ -15,8 +15,8 @@ paths:
     $ref: paths/{schema}.yaml
   /{schema}/{version}:
     $ref: paths/{schema}_{version}.yaml
-  /{schema}/{version}/attributes: #really?
-    $ref: paths/{schema}_{version}_attributes.yaml
+ # /{schema}/{version}/attributes: #really?
+ #   $ref: paths/{schema}_{version}_attributes.yaml
   /{schema}/{version}/classes:
     $ref: paths/{schema}_{version}_classes.yaml
   /{schema}/{version}/datatypes:
