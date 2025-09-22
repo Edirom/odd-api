@@ -116,7 +116,8 @@ declare function common:get-spec-basic-data($spec as element(), $docLang as xs:s
     let $spec-basic-data :=
         map {
             'ident': $spec/data(@ident),
-            'desc': $gloss-desc('desc')
+            'desc': $gloss-desc('desc'),
+            'type': $type
         }
     return
         switch($type)
