@@ -12,6 +12,10 @@ get:
         application/vnd.api+json:
           schema:
             $ref: "../components/schemas/detailsElementJsonResponse.yaml"
+        application/xml:
+          schema:
+            type: string
+            format: xml
     '400':
       description: Bad request
     '404':

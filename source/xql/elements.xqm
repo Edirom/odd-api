@@ -114,6 +114,38 @@ declare
             }
 };
 
+declare
+    %rest:GET
+    %rest:path("/v2/{$schema}/{$version}/elements/{$id}")
+    %rest:query-param("docLang", "{$docLang}", "")
+    %rest:produces("application/xml")
+    %rest:produces("application/tei+xml")
+    %output:media-type("application/xml")
+    %output:method("xml")
+    function elements:get-element-xml(
+        $schema as xs:string, $version as xs:string,
+        $id as xs:string, $docLang as xs:string*
+        ) {
+            try {
+                $common:response-headers,
+                if (common:odd-source($schema, $version)//tei:elementSpec[@ident = $id])
+                then common:odd-source($schema, $version)//tei:elementSpec[@ident = $id]
+                else error(
+                    $common:SPEC_NOT_FOUND_ERROR,
+                    'No elementSpec found for ident "' || $id || '".'
+                )
+            }
+            catch * {
+                common:set-status($common:response-headers, 404),
+                common:json-api-error-object(
+                    $err:description,
+                    common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                    404,
+                    string($err:code)
+                )
+            }
+};
+
 (:~
  : Retrieve all elements defined in a specific module
  : Helper function for elements:elements-v1
