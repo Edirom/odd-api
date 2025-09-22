@@ -11,10 +11,7 @@ const existConfig = require('./existConfig.json');
 const existClient = exist.createClient(existConfig);
 
 const git = require('git-rev-sync');
-const source = require('vinyl-source-stream');
-const buffer = require('vinyl-buffer');
 const del = require("del");
-const runSequence = require('run-sequence').use(gulp);
 
 //handles xqueries
 gulp.task('xql', function(){

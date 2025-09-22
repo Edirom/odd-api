@@ -4,7 +4,8 @@
   "description": "This is a small exist-db app which makes the ODD structures of an MEI or TEI document available through a REST api",
   "main": "index.js",
   "scripts": {
-    "build": "./node_modules/.bin/gulp dist",
+    "build": "./node_modules/.bin/gulp del dist",
+    "build-for-tests": "./node_modules/.bin/gulp del dist-with-tests",
     "clean": "./node_modules/.bin/gulp del",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,9 +27,6 @@
     "gulp-newer": "^1.4.0",
     "gulp-replace": "^1.1.3",
     "gulp-zip": "^5.1.0",
-    "@redocly/cli": "^1.34.5",
-    "run-sequence": "^2.2.1",
-    "vinyl-buffer": "^1.0.1",
-    "vinyl-source-stream": "^2.0.0"
+    "@redocly/cli": "^1.34.5"
   }
 }
