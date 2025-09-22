@@ -66,7 +66,7 @@ declare
                     $err:description,
                     common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
                     404,
-                    $err:code
+                    string($err:code)
                 )
             }
             catch * {
@@ -75,7 +75,7 @@ declare
                     $err:description,
                     common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
                     404,
-                    $err:code
+                    string($err:code)
                 )
             }
 };
@@ -100,7 +100,7 @@ declare
                     $err:description,
                     common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
                     404,
-                    $err:code
+                    string($err:code)
                 )
             }
             catch * {
@@ -109,7 +109,7 @@ declare
                     $err:description,
                     common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
                     404,
-                    $err:code
+                    string($err:code)
                 )
             }
 };
