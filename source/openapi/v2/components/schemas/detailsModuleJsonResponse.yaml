@@ -1,0 +1,47 @@
+allOf:
+  - type: object
+    properties:
+      data:
+        type: array
+        items:
+          type: object
+          allOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  default: moduleDetails
+                id:
+                  type: string
+                  description: The unique identifier as required by the JSON:API specification
+                attributes:
+                  type: object
+                  properties:
+                    ident:
+                      type: string
+                      description: The identifier for the module (e.g. "analysis", "header")
+                    type:
+                      type: string
+                      description: The type of the specification
+                      default: module
+                    desc:
+                      type: array
+                      items:
+                        type: object
+                        description: The description as provided by the `desc` element in the ODD
+                        properties:
+                          lang:
+                            type: string
+                            description: The language code (e.g. "en", "de", "fr")
+                          text:
+                            type: string
+                            description: The description text
+                    members:
+                      type: array
+                      description: |- 
+                        The members of this module, i.e. the elements, classes, etc 
+                        that claim affiliation with this module via the `module` attribute.
+                      items:
+                        type: object
+            - $ref: ./selfLink.yaml
+  - $ref: ./selfLink.yaml

@@ -1,0 +1,28 @@
+get:
+  summary: Get a specific module's details for a version of a schema
+  parameters:
+    - $ref: "../components/parameters/schemaParam.yaml"
+    - $ref: "../components/parameters/versionParam.yaml"
+    - $ref: "../components/parameters/idParam.yaml"
+    - $ref: "../components/parameters/docLangParam.yaml"
+  responses:
+    '200':
+      description: Successful operation
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: "../components/schemas/detailsModuleJsonResponse.yaml"
+        application/xml:
+          schema:
+            type: string
+            format: xml
+    '400':
+      description: Bad request
+    '404':
+      description: Resource not found
+      content:
+        application/vnd.api+json:
+          schema:
+            $ref: "../components/schemas/errorNotFound.yaml"
+    '500':
+      description: Internal server error

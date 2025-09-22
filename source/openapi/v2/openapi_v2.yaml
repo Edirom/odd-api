@@ -39,3 +39,6 @@ paths:
     $ref: paths/{schema}_{version}_macros.yaml
   /{schema}/{version}/modules:
     $ref: paths/{schema}_{version}_modules.yaml
+  /{schema}/{version}/modules/{id}:
+    $ref: paths/{schema}_{version}_modules_{id}.yaml
+
