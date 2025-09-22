@@ -249,6 +249,15 @@ declare function common:decode-jsonapi-id($id as xs:string) as map(*) {
         }
 };
 
+(:~
+ : Generates a JSON error object for API responses
+ :
+ : @param $title The title of the error, usually the content of `$err:description`
+ : @param $source The source of the error (e.g., the endpoint including parameters)
+ : @param $status The HTTP status code (optional, defaults to 404)
+ : @param $code An application-specific error code (usually the content of `$err:code`, defaults to 'unknownError')
+ : @return A map representing the JSON error object
+ :)
 declare function common:json-api-error-object(
     $title as xs:string, $source as xs:string,
     $status as xs:integer?, $code as xs:string?) as map(*) {
@@ -263,6 +272,31 @@ declare function common:json-api-error-object(
                         'title': $title
                     }
                 }
+        }
+};
+
+(:~
+ : Generates an XML error object for API responses
+ :
+ : @param $title The title of the error, usually the content of `$err:description`
+ : @param $source The source of the error (e.g., the endpoint including parameters)
+ : @param $status The HTTP status code (optional, defaults to 404)
+ : @param $code An application-specific error code (usually the content of `$err:code`, defaults to 'unknownError')
+ : @return An XML document node representing the error
+ :)
+declare function common:xml-api-error-object(
+    $title as xs:string, $source as xs:string,
+    $status as xs:integer?, $code as xs:string?) as document-node() {
+        document {
+            <error status="{if($status) then $status else '404'}" source="{$source}">
+                <code>{if($code) then $code else 'unknownError'}</code>
+                <title>{$title}</title>
+                <detail>The OpenAPI documentation of the ODD-API can be found at
+                    <link target="https://odd-api.edirom.de/v2/index.html">https://odd-api.edirom.de/v2/index.html</link>.
+                    If you find the specification or implementation faulty please file an issue at
+                    <link target="https://github.com/Edirom/odd-api/issues">https://github.com/Edirom/odd-api/issues</link>.
+                </detail>
+            </error>
         }
 };
 
