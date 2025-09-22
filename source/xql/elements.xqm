@@ -199,7 +199,8 @@ declare %private function elements:get-element-details(
                 let $attributes :=
                     array { elements:work-out-attributes($elementSpec, $odd-source, $docLang) }
                     => array:sort((), function($att) {$att?ident})
-                let $content := elements:work-out-content($elementSpec, $odd-source)
+                let $content := elements:work-out-content($elementSpec, $odd-source, $docLang) => elements:idents2specs($odd-source, $docLang)
+                let $context := elements:work-out-context($elementSpec, $odd-source, $docLang) => elements:idents2specs($odd-source, $docLang)
                 return
                     map {
                         'data': array {
@@ -208,6 +209,7 @@ declare %private function elements:get-element-details(
                                 'id': common:encode-jsonapi-id($schema, $version, 'elements', $elementIdent),
                                 'attributes':
                                     map:put($basic-data, 'attributes', $attributes)
+                                    => map:put('context', $context)
                                     => map:put('content', $content),
                                 'links': map { 'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, (rest:base-uri(), 'v2', $schema, $version, 'elements', $elementIdent)) }
                             }
@@ -221,8 +223,20 @@ declare %private function elements:get-element-details(
                 )
 };
 
-declare function elements:work-out-content($spec as element()?, $odd-source as element(tei:TEI)) as array(*) {
-    array {(
+(:~
+ : Recursive retrieval of all elements that can appear in the content model of
+ : a specific element, including elements defined in model classes,
+ : and elements defined in macros used in the content model.
+ :
+ : @param $spec The elementSpec or macroSpec element for which to retrieve content
+ : @param $odd-source The ODD source document
+ : @param $docLang The documentation language(s) to use
+ : @return A sequence of idents as strings
+ :)
+declare function elements:work-out-content(
+    $spec as element()?,
+    $odd-source as element(tei:TEI),
+    $docLang as xs:string*) as xs:string* {
         for $descendant in $spec/tei:content//*
         return
             typeswitch($descendant)
@@ -239,15 +253,20 @@ declare function elements:work-out-content($spec as element()?, $odd-source as e
                     )
                     else $descendant/string(@name)
                 case element(tei:macroRef) return
-                    $odd-source//tei:macroSpec[@ident = $descendant/@key] => elements:work-out-content($odd-source)
+                    $odd-source//tei:macroSpec[@ident = $descendant/@key] => elements:work-out-content($odd-source, $docLang)
                 case element(tei:empty) return 'empty'
                 case element(tei:anyElement) return 'anyElement'
                 default return ()
-    ) => distinct-values()
-    } => array:sort()
 };
 
-declare function elements:work-out-class-membership($spec as element()?, $odd-source as element(tei:TEI)) as xs:string* {
+(:~
+ : Recursive retrieval of all elements that are members of a specific class.
+ :
+ : @param $spec The classSpec element for which to retrieve class members
+ : @param $odd-source The ODD source document
+ : @return A sequence of element idents
+ :)
+declare function elements:work-out-class-membership($spec as element(tei:classSpec)?, $odd-source as element(tei:TEI)) as xs:string* {
     $odd-source//tei:memberOf[range:eq(@key, $spec/@ident)]/ancestor::tei:elementSpec/string(@ident),
     $odd-source//tei:memberOf[range:eq(@key, $spec/@ident)]/ancestor::tei:classSpec ! elements:work-out-class-membership(., $odd-source)
 };
@@ -259,8 +278,9 @@ declare function elements:work-out-class-membership($spec as element()?, $odd-so
  : Local attributes are marked with 'class': 'local', attributes from attribute classes
  : are marked with their respective class ident.
  :
- : @param $odd-source The ODD source document
  : @param $spec The spec element (classSpec or elementSpec) for which to retrieve attributes
+ : @param $odd-source The ODD source document
+ : @param $docLang The documentation language(s) to use
  : @return A sequence of maps
  :)
 declare function elements:work-out-attributes(
@@ -270,4 +290,61 @@ declare function elements:work-out-attributes(
         for $key in $spec/tei:classes/tei:memberOf/@key[starts-with(.,'att.')]
         let $class := $odd-source//tei:classSpec[@type = 'atts'][@ident = $key]
         return elements:work-out-attributes($class, $odd-source, $docLang)
+};
+
+(:~
+ : Compute the context in which an element can appear, i.e.
+ : all elements that can contain it, either directly, or via
+ : model classes or macros.
+ :
+ : @param $spec The elementSpec element for which to compute the context
+ : @param $odd-source The ODD source document
+ : @param $docLang The documentation language(s) to use
+ : @return A sequence of idents as strings
+ :)
+declare function elements:work-out-context(
+    $spec as element()?,
+    $odd-source as element(tei:TEI),
+    $docLang as xs:string*) as xs:string* {
+        let $directMembership :=
+            $odd-source//tei:elementRef[@key = $spec/@ident][ancestor::tei:content]/ancestor::tei:elementSpec/@ident |
+            $odd-source//tei:macroRef[@key = $spec/@ident][ancestor::tei:content]/ancestor::tei:elementSpec/@ident |
+            $odd-source//tei:classRef[@key = $spec/@ident][ancestor::tei:content]/ancestor::tei:elementSpec/@ident |
+            $odd-source//rng:ref[@name = $spec/@ident][ancestor::tei:content]/ancestor::tei:elementSpec/@ident
+        let $macroMembership :=
+            (: need to iterate over every macro here :)
+            for $macroSpec in $odd-source//tei:macroSpec
+            let $macroContent := elements:work-out-content($macroSpec, $odd-source, $docLang)
+            where $macroContent = $spec/@ident
+            return
+                $odd-source//tei:macroRef[@key = $macroSpec/@ident][ancestor::tei:content]/ancestor::tei:elementSpec/@ident
+        let $classMembership :=
+            for $className in $spec/tei:classes/tei:memberOf/@key[starts-with(.,'model.')]
+            return
+                elements:work-out-context($odd-source//tei:classSpec[@ident=$className], $odd-source, $docLang)
+        return (
+            $directMembership, $macroMembership, $classMembership
+        )
+};
+
+(:~
+ : Compute the specs for a list of element idents
+ : by calling `common:get-spec-basic-data` for each ident.
+ : Helper function for `work-out-content` and `work-out-context`.
+ :
+ : @param $idents A sequence of element idents
+ : @param $odd-source The ODD source document
+ : @param $docLang The documentation language(s) to use
+ : @return An array of map objects
+ :)
+declare %private function elements:idents2specs(
+    $idents as xs:string*, $odd-source as element(tei:TEI),
+    $docLang as xs:string) as array(*) {
+        let $specs :=
+            array {
+                for $ident in distinct-values($idents)
+                return $odd-source//tei:elementSpec[@ident = $ident] => common:get-spec-basic-data($docLang)
+            }
+        return
+            $specs => array:sort((), function($obj) {$obj?ident})
 };
