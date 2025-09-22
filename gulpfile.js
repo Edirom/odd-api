@@ -130,6 +130,17 @@ gulp.task('dist', gulp.series('xar-structure', 'html', 'xql', 'data', 'openapi_v
     done();
 }));
 
+//copies XQSuite test files to the build folder
+gulp.task('xqsuite', function(){
+    return gulp.src('./tests/xqsuite/**/*')
+        .pipe(gulp.dest('./build/xqsuite'));
+});
+
+//creates a dist version including the XQSuite tests
+gulp.task('dist-with-tests', gulp.series('xqsuite', 'dist', function (done) {
+    done();
+}));
+
 //reading from fs as this prevents caching problems    
 function getPackageJsonVersion() {
     return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
