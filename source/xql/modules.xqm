@@ -33,22 +33,13 @@ declare
             $common:response-headers,
             modules:get-modules-shallow-list($schema, $version, $docLang)
         }
-        catch common:OddNotFoundError {
-            common:set-status($common:response-headers, 404),
-            common:json-api-error-object(
-                $err:description,
-                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
-                404,
-                $err:code
-            )
-        }
         catch * {
             common:set-status($common:response-headers, 404),
             common:json-api-error-object(
                 $err:description,
                 common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
                 404,
-                $err:code
+                string($err:code)
             )
         }
 };

@@ -60,15 +60,6 @@ declare
                 $common:response-headers,
                 elements:get-elements-shallow-list($schema, $version, $class, $docLang, $module)
             }
-            catch common:OddNotFoundError {
-                common:set-status($common:response-headers, 404),
-                common:json-api-error-object(
-                    $err:description,
-                    common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
-                    404,
-                    string($err:code)
-                )
-            }
             catch * {
                 common:set-status($common:response-headers, 404),
                 common:json-api-error-object(
@@ -93,15 +84,6 @@ declare
             try {
                 $common:response-headers,
                 elements:get-element-details($schema, $version, $id, $docLang)
-            }
-            catch common:OddNotFoundError {
-                common:set-status($common:response-headers, 404),
-                common:json-api-error-object(
-                    $err:description,
-                    common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
-                    404,
-                    string($err:code)
-                )
             }
             catch * {
                 common:set-status($common:response-headers, 404),
