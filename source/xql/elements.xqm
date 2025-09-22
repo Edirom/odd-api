@@ -254,8 +254,9 @@ declare function elements:work-out-content(
                     else $descendant/string(@name)
                 case element(tei:macroRef) return
                     $odd-source//tei:macroSpec[@ident = $descendant/@key] => elements:work-out-content($odd-source, $docLang)
-                case element(tei:empty) return 'empty'
-                case element(tei:anyElement) return 'anyElement'
+                case element(tei:empty) return 'odd-special-content-model-element-empty'
+                case element(tei:anyElement) return 'odd-special-content-model-element-anyElement'
+                case element(tei:textNode) return 'odd-special-content-model-element-textNode'
                 default return ()
 };
 
@@ -342,8 +343,10 @@ declare %private function elements:idents2specs(
     $docLang as xs:string) as array(*) {
         let $specs :=
             array {
-                for $ident in distinct-values($idents)
-                return $odd-source//tei:elementSpec[@ident = $ident] => common:get-spec-basic-data($docLang)
+                for $ident in distinct-values($idents)[not(starts-with(., 'odd-special-content-model-element-'))]
+                return $odd-source//tei:elementSpec[@ident = $ident] => common:get-spec-basic-data($docLang),
+                for $ident in distinct-values($idents)[starts-with(., 'odd-special-content-model-element-')]
+                return map { 'ident': $ident}
             }
         return
             $specs => array:sort((), function($obj) {$obj?ident})
