@@ -7,9 +7,11 @@ import module namespace test="http://exist-db.org/xquery/xqsuite" at "resource:o
  
 import module namespace it="http://odd-api.edirom.de/xql/integration-tests" at "integration-tests.xqm";
 import module namespace et="http://odd-api.edirom.de/xql/element-tests" at "element-tests.xqm";
+import module namespace mt="http://odd-api.edirom.de/xql/module-tests" at "module-tests.xqm";
 
 (: the test:suite() function will run all the test-annotated functions in the module whose namespace URI you provide :)
 test:suite((
     util:list-functions("http://odd-api.edirom.de/xql/integration-tests"),
-    util:list-functions("http://odd-api.edirom.de/xql/element-tests")
+    util:list-functions("http://odd-api.edirom.de/xql/element-tests"),
+    util:list-functions("http://odd-api.edirom.de/xql/module-tests")
 ))

@@ -44,6 +44,31 @@ declare
         }
 };
 
+declare
+    %rest:GET
+    %rest:path("/v2/{$schema}/{$version}/modules/{$id}")
+    %rest:query-param("docLang", "{$docLang}", "")
+    %output:media-type("application/vnd.api+json")
+    %output:method("json")
+    function modules:get-module(
+        $schema as xs:string, $version as xs:string,
+        $id as xs:string, $docLang as xs:string*
+        ) {
+            try {
+                $common:response-headers,
+                modules:get-module-details($schema, $version, $id, $docLang)
+            }
+            catch * {
+                common:set-status($common:response-headers, 404),
+                common:json-api-error-object(
+                    $err:description,
+                    common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                    404,
+                    string($err:code)
+                )
+            }
+};
+
 declare %private function modules:get-modules-v1($schema as xs:string, $version as xs:string, $docLang as xs:string) as array(*) {
     let $odd-source := common:odd-source($schema, $version)
     let $modules :=
@@ -90,4 +115,52 @@ declare %private function modules:get-modules-shallow-list(
                     'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri())
                 }
             }
+};
+
+declare function modules:get-module-details(
+    $schema as xs:string,
+    $version as xs:string,
+    $id as xs:string,
+    $docLang as xs:string*) as map(*) {
+        let $odd-source := common:odd-source($schema, $version)
+        let $decoded-id := common:decode-jsonapi-id($id)?ident
+        let $moduleIdent :=
+            if($decoded-id) then $decoded-id
+            else $id
+        let $moduleSpec := $odd-source//tei:moduleSpec[@ident = $moduleIdent]
+        return
+            if($moduleSpec)
+            then
+                let $basic-data := common:get-spec-basic-data($moduleSpec, $docLang)
+                let $members := modules:work-out-members($odd-source, $moduleIdent, $docLang)
+                return
+                    map {
+                        'data': array {
+                            map {
+                                'type': 'moduleDetails',
+                                'id': common:encode-jsonapi-id($schema, $version, 'modules', $moduleIdent),
+                                'attributes': map:put($basic-data, 'members', $members),
+                                'links': map { 'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, (rest:base-uri(), 'v2', $schema, $version, 'modules', $moduleIdent)) }
+                            }
+                        },
+                        'links': map { 'self': common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()) }
+                    }
+            else
+                error(
+                    $common:SPEC_NOT_FOUND_ERROR,
+                    'No moduleSpec found for ident "' || $moduleIdent || '".'
+                )
+};
+
+declare function modules:work-out-members(
+    $odd-source as element(tei:TEI),
+    $moduleIdent as xs:string,
+    $docLang as xs:string*) as array(*) {
+        array {(
+            $odd-source//tei:elementSpec[@module = $moduleIdent] |
+            $odd-source//tei:classSpec[@module = $moduleIdent] |
+            $odd-source//tei:dataSpec[@module = $moduleIdent] |
+            $odd-source//tei:macroSpec[@module = $moduleIdent]
+            ) ! common:get-spec-basic-data(., $docLang)
+        } => array:sort((), function($obj) {$obj?ident})
 };
