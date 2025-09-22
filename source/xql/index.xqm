@@ -254,17 +254,16 @@ declare
     %output:media-type("application/xml")
     %output:method("xml")
     function index:get-odd-source-v2($schema as xs:string, $version as xs:string) {
-        let $odd-source := common:odd-source($schema, $version)
-        return
-            if($odd-source)
-            then (
-                $common:response-headers,
-                $odd-source
+        try { common:odd-source($schema, $version) }
+        catch * {
+            common:set-status($common:response-headers, 404),
+            common:xml-api-error-object(
+                $err:description,
+                common:build-absolute-uri(req:hostname#0, req:scheme#0, req:port#0, rest:uri()),
+                404,
+                string($err:code)
             )
-            else (
-                common:set-status($common:response-headers, 404),
-                <error code="404">{'The requested version "' || $version || '" for schema "' || $schema || '" could not be found'}</error>
-            )
+        }
 };
 
 (:~
