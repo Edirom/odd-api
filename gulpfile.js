@@ -1,17 +1,19 @@
-const gulp = require('gulp');
-const zip = require('gulp-zip');
-const replace = require('gulp-replace');
-const newer = require('gulp-newer');
-const exist = require('@existdb/gulp-exist');
-const dateformat = require('dateformat');
-const fs = require('fs');
+import gulp from 'gulp';
+import zip from 'gulp-zip';
+import replace from 'gulp-replace';
+import newer from 'gulp-newer';
+import exist from '@existdb/gulp-exist';
+import dateformat from 'dateformat';
+import fs from 'fs';
+import { readFileSync } from 'fs';
+import git from 'git-rev-sync';
+import { deleteAsync } from 'del';
+import { exec } from 'child_process';
 
-const packageJson = require('./package.json');
-const existConfig = require('./existConfig.json');
+const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
+const existConfig = JSON.parse(readFileSync('./existConfig.json', 'utf8'));
 const existClient = exist.createClient(existConfig);
 
-const git = require('git-rev-sync');
-const del = require("del");
 
 //handles xqueries
 gulp.task('xql', function(){
@@ -85,7 +87,6 @@ gulp.task('openapi_v1', function(){
 
 // bundles the v2 openapi file using redocly and saves it to the build folder
 gulp.task('openapi_v2', function (done) {
-    const { exec } = require('child_process');
 
     // create the target folder
     const outputDir = './build';
@@ -106,7 +107,7 @@ gulp.task('openapi_v2', function (done) {
 
 //empty build folder
 gulp.task('del', function() {
-    return del(['./build/**/*','./dist/' + packageJson.name + '-' + getPackageJsonVersion() + '.xar']);
+    return deleteAsync(['./build/**/*','./dist/' + packageJson.name + '-' + getPackageJsonVersion() + '.xar']);
 });
 
 /**
