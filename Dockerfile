@@ -3,7 +3,7 @@
 # 1. set up the build environment and build the expath-package
 # 2. run the eXist-db
 #########################
-FROM node:22 AS builder
+FROM node:25 AS builder
 
 ENV ODDAPI_BUILD_HOME="/opt/oddapi-build"
 
