@@ -19,7 +19,7 @@
   "license": "AGPL-3.0",
   "dependencies": {
     "@existdb/gulp-exist": "^5.0.0",
-    "@redocly/cli": "^2.18.2",
+    "@redocly/cli": "^2.19.1",
     "dateformat": "^5.0.0",
     "del": "^8.0.0",
     "git-rev-sync": "^3",
