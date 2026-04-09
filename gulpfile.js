@@ -2,7 +2,7 @@ import gulp from 'gulp';
 import zip from 'gulp-zip';
 import replace from 'gulp-replace';
 import newer from 'gulp-newer';
-import exist from '@existdb/gulp-exist';
+import { createClient } from '@existdb/gulp-exist';
 import dateformat from 'dateformat';
 import fs from 'fs';
 import { readFileSync } from 'fs';
@@ -12,7 +12,7 @@ import { exec } from 'child_process';
 
 const packageJson = JSON.parse(readFileSync('./package.json', 'utf8'));
 const existConfig = JSON.parse(readFileSync('./existConfig.json', 'utf8'));
-const existClient = exist.createClient(existConfig);
+const existClient = createClient(existConfig);
 
 
 //handles xqueries
