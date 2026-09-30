@@ -11,6 +11,8 @@ updates:
       interval: "monthly"
     labels:
       - "dependencies"
+    assignees:
+      - "peterstadler"
 
   # Enable version updates for npm
   - package-ecosystem: "npm"
@@ -19,6 +21,8 @@ updates:
       interval: "monthly"
     labels:
       - "dependencies"
+    assignees:
+      - "peterstadler"
 
   # Enable version updates for Docker
   - package-ecosystem: "docker"
@@ -27,3 +31,5 @@ updates:
       interval: "monthly"
     labels:
       - "dependencies"
+    assignees:
+      - "peterstadler"
