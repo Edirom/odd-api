@@ -21,7 +21,7 @@
     "@existdb/gulp-exist": "^6.0.0",
     "@redocly/cli": "^2.49.0",
     "dateformat": "^5.0.0",
-    "del": "^8.0.0",
+    "del": "^9.0.1",
     "git-rev-sync": "^3",
     "gulp": "^5.0.0",
     "gulp-cli": "^3.0.0",
